@@ -10,7 +10,7 @@ const Dashboard: FC<DashboardProps> = ({
     children,
     className
 }) => {
-    const baseClass = "w-full h-full bg-[#F5F6FA] dark:bg-[#1B2431]";
+    const baseClass = "w-full h-full bg-layout-light dark:bg-layout-dark";
     return (
         <div
             className={cn(baseClass, className)}

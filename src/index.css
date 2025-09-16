@@ -6,3 +6,13 @@
 #root {
   height: 100vh;
 }
+
+@theme {
+  --color-primary: #4880FF;
+  --color-primary-hover: #4277EF;
+  --color-layout-light: #F5F6FA;
+  --color-layout-dark: #1B2431;
+  --color-items-dark: #273142;
+  --color-lightgray: #E0E0E0;
+  --color-darkgray: #6b6b6b;
+}
