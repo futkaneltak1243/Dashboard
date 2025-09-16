@@ -3,19 +3,16 @@ import { cn } from "../classNames";
 
 interface DashboardProps {
     children: ReactNode;
-    backgroundColor?: string;
     className?: string;
 }
 
 const Dashboard: FC<DashboardProps> = ({
     children,
-    backgroundColor = "#FFFFFF",
     className
 }) => {
-    const baseClass = "w-full h-full";
+    const baseClass = "w-full h-full bg-[#F5F6FA] dark:bg-[#1B2431]";
     return (
         <div
-            style={{ backgroundColor }}
             className={cn(baseClass, className)}
         >
             {children}
