@@ -12,7 +12,10 @@
   --color-primary-hover: #4277EF;
   --color-layout-light: #F5F6FA;
   --color-layout-dark: #1B2431;
+  --color-items-light: #FFFFFF;
   --color-items-dark: #273142;
+  --color-items-dark2: #343D4D;
   --color-lightgray: #E0E0E0;
+  --color-midgray: #858585;
   --color-darkgray: #6b6b6b;
 }

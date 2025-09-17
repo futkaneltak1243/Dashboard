@@ -4,7 +4,7 @@ import { Sidebar } from './components/Sidebar'
 import { Gauge } from "lucide-react"
 import { Button } from './components/Button'
 import { useSidebar } from './contexts/sidebar-context/SidebarContextProvider'
-
+import { Searchbar } from "./components/Searchbar"
 function App() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   return (
@@ -38,9 +38,10 @@ function App() {
           <Sidebar.NavItem title="Dashboard" Icon={Gauge} open={isSidebarOpen} onClick={() => null} selected={false}></Sidebar.NavItem >
           <Sidebar.NavItem title="Dashboard" Icon={Gauge} open={isSidebarOpen} onClick={() => null} selected={false}></Sidebar.NavItem >
 
-
         </Sidebar>
         <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)}></Button>
+        <Searchbar size="lg"></Searchbar>
+
       </div>
     </Dashboard>
   )

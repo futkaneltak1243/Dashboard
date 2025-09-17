@@ -41,7 +41,6 @@ interface ButtonProps
     extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
     children?: ReactNode
-    className?: string
 }
 
 const Button: FC<ButtonProps> = ({

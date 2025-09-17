@@ -131,7 +131,7 @@ const Sidebar: FC<SidebarProps> & {
     return (
         <div
             className={cn(
-                "h-screen overflow-auto bg-white dark:bg-items-dark shadow-2xl transition-all duration-150",
+                "h-screen overflow-auto bg-items-light dark:bg-items-dark shadow-md transition-all duration-150",
                 open ? "w-[240px]" : "w-[86px]",
                 className
             )}
