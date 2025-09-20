@@ -31,6 +31,7 @@ interface HeaderProps {
     children: ReactNode;
 }
 
+
 const NavItem: FC<NavItemProps> = ({
     className,
     Icon,

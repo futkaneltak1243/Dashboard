@@ -36,7 +36,7 @@ export const ThemeProvider: FC<{ children: ReactNode, storageKey?: string }> = (
         root.classList.remove("dark", "light")
 
         if (theme === "system") {
-            const systemTheme = window.matchMedia("(prefer-color-scheme: dark)").matches ? "dark" : "light"
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
 
             root.classList.add(systemTheme)
             return

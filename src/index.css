@@ -7,8 +7,12 @@
   height: 100vh;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #4880FF;
+  --color-text-light: #000000;
+  --color-text-dark: #FFFFFF;
   --color-primary-hover: #4277EF;
   --color-layout-light: #F5F6FA;
   --color-layout-dark: #1B2431;
