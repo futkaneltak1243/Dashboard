@@ -11,6 +11,7 @@ import { useCloseOnEscape } from "../../hooks/useCloseOnEscape";
 
 interface TriggerWithPopoverProps {
     children: ReactNode;
+    className?: string;
 }
 
 
@@ -24,6 +25,7 @@ interface PopoverProps {
     fullOnSmallScreen?: boolean;
     offsetY?: number;
     offsetX?: number;
+    side?: boolean;
 }
 
 interface CloseProps {
@@ -50,7 +52,7 @@ const TriggerWithPopover: FC<TriggerWithPopoverProps> & {
     Trigger: FC<TriggerProps>;
     Popover: FC<PopoverProps>;
     Close: FC<CloseProps>;
-} = ({ children }) => {
+} = ({ children, className }) => {
 
     const [popoverOpen, setPopoverOpen] = useState(false)
     const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -61,7 +63,7 @@ const TriggerWithPopover: FC<TriggerWithPopoverProps> & {
         triggerRef,
     }
 
-    return <TriggerWithPopoverContext.Provider value={contextValue}>{children}</TriggerWithPopoverContext.Provider>;
+    return <TriggerWithPopoverContext.Provider value={contextValue}><div className={className}>{children}</div></TriggerWithPopoverContext.Provider>;
 };
 
 
@@ -85,7 +87,7 @@ const Trigger: FC<TriggerProps> = ({ children, className, onClick, ...rest }) =>
 }
     ;
 
-const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = false, offsetY = 0, offsetX = 0 }) => {
+const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = false, offsetY = 0, offsetX = 0, side = false }) => {
 
     const { triggerRef, setPopoverOpen, popoverOpen } = useTriggerWithPopover()
     const [popoverX, setX] = useState(0)
@@ -105,9 +107,19 @@ const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = fa
 
         const { x, y, width, height } = triggerRef.current.getBoundingClientRect();
         const rect = popoverRef.current.getBoundingClientRect();
-        const largeScreenX = Math.max(x + window.scrollX + width / 2 - rect.width / 2 + offsetX, 0);
+        let largeScreenX: number;
+        let newY: number;
+        if (side) {
+            largeScreenX = Math.max(x + window.scrollX + width + offsetX, 0)
+            newY = y
+        } else {
+            largeScreenX = Math.max(x + window.scrollX + width / 2 - rect.width / 2 + offsetX, 0);
+            newY = y + window.scrollY + height + offsetY;
+        }
+        if (largeScreenX + rect.width > window.innerWidth) {
+            largeScreenX = window.innerWidth - rect.width
+        }
         const smallScreenX = 0;
-        const newY = y + window.scrollY + height + offsetY;
         setY(newY);
 
 
@@ -126,20 +138,19 @@ const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = fa
 
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [popoverOpen, fullOnSmallScreen, offsetY, offsetX, setPopoverOpen]);
+    }, [popoverOpen, fullOnSmallScreen, setPopoverOpen]);
 
 
 
 
     return createPortal(
-        <div className={cn("absolute", className, {
+        <div className={cn("absolute z-40", className, {
             "hidden": !popoverOpen,
             "w-full sm:w-fit": fullOnSmallScreen
         })}
             style={{
                 top: popoverY,
                 left: popoverX,
-                zIndex: 99,
             }}
             ref={popoverRef}
         >

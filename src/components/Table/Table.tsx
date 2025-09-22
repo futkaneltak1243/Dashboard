@@ -44,7 +44,7 @@ const Head: FC<HeadProps> = ({ children }) => {
 }
 
 const Body: FC<BodyProps> = ({ children }) => {
-    return <tbody>{children}</tbody>
+    return <tbody className="divide-y divide-lightgray dark:divide-darkgray">{children}</tbody>
 }
 
 const HeadRow: FC<HeadRowProps> = ({ children, className }) => {

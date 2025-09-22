@@ -6,7 +6,7 @@ import { cn } from "../classNames"
 
 
 const buttonVariants = cva(
-    "w-full flex items-center justify-center cursor-pointer rounded-[8px] transiton-all duration-[150ms]",
+    "w-full flex items-center justify-center cursor-pointer rounded-[8px] transiton-all duration-[150ms] text-xs",
     {
         variants: {
             variant: {

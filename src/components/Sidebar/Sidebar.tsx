@@ -132,9 +132,11 @@ const Sidebar: FC<SidebarProps> & {
     return (
         <div
             className={cn(
-                "h-screen overflow-auto bg-items-light dark:bg-items-dark shadow-md transition-all duration-150",
-                open ? "w-[240px]" : "w-[86px]",
-                className
+                "h-screen overflow-auto bg-items-light dark:bg-items-dark shadow-md transition-all duration-150 -translate-x-full sm:relative fixed top-0 w-[240px] left-0 z-30 sm:block sm:translate-0 sm:w-[86px]",
+                className,
+                {
+                    " sm:w-[240px] translate-x-0": open
+                }
             )}
         >
             {children}
