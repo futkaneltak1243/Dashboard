@@ -12,13 +12,14 @@ interface ItemProps {
     Icon: ElementType;
     title: string;
     desicription: string;
+    onClick?: () => void;
 }
 
 const Notification: FC<NotificationProps> & {
     Item: FC<ItemProps>,
 } = ({ children, notificationCount = 0 }) => {
     return (
-        <TriggerWithPopover>
+        <TriggerWithPopover className="flex">
             <TriggerWithPopover.Trigger>
                 <div className="relative">
                     <Bell className="text-primary" />
@@ -48,19 +49,21 @@ const Notification: FC<NotificationProps> & {
 }
 
 
-const Item: FC<ItemProps> = ({ Icon, title, desicription }) => {
+const Item: FC<ItemProps> = ({ Icon, title, desicription, onClick }) => {
     return (
-        <div className="w-full flex items-center  h-[60px] py-[12px]">
-            <div className="ml-[20px] mr-[12px]">
-                <Icon className="dark:text-white" />
-            </div>
-            <div >
-                <h2 className="text-sm text-text-light dark:text-text-dark">{title}</h2>
-                <p className="text-xs text-midgray">{desicription}</p>
+        <button onClick={onClick} className="w-full cursor-pointer">
+            <div className="w-full flex items-center  h-[60px] py-[12px]">
+                <div className="ml-[20px] mr-[12px]">
+                    <Icon className="dark:text-white" />
+                </div>
+                <div className="text-left">
+                    <h2 className="text-sm text-text-light dark:text-text-dark">{title}</h2>
+                    <p className="text-xs text-midgray">{desicription}</p>
 
 
+                </div>
             </div>
-        </div>
+        </button>
     )
 }
 

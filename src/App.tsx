@@ -7,6 +7,8 @@ import { Button } from './components/Button'
 import { useTheme } from './contexts/theme-context/ThemeContextProvider'
 import { FilterBar } from './components/Filter'
 import { Notification } from './components/Notification'
+import { AccountMenu } from './components/AccountMenu'
+
 function App() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const { theme, setTheme } = useTheme()
@@ -141,6 +143,14 @@ function App() {
               <Notification.Item title='Settings' desicription='Update Dashboard' Icon={Settings} />
 
             </Notification>
+
+            <AccountMenu avatar='https://avatar.iran.liara.run/public' name="Furkan" role='Admin' >
+              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
+              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
+              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
+              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
+
+            </AccountMenu>
 
 
           </div>
