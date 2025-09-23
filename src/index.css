@@ -28,4 +28,8 @@
   --text-md: 14px;
 
 
+  --breakpoint-md-stats: 800px;
+  --breakpoint-xs-stats: 500px;
+  --breakpoint-2xs-stats: 390px;
+
 }

@@ -6,6 +6,7 @@ import { cn } from "../classNames"
 interface NotificationProps {
     children?: ReactNode;
     notificationCount?: number;
+    className?: string;
 }
 
 interface ItemProps {
@@ -17,9 +18,9 @@ interface ItemProps {
 
 const Notification: FC<NotificationProps> & {
     Item: FC<ItemProps>,
-} = ({ children, notificationCount = 0 }) => {
+} = ({ children, className, notificationCount = 0 }) => {
     return (
-        <TriggerWithPopover className="flex">
+        <TriggerWithPopover className={cn("flex", className)}>
             <TriggerWithPopover.Trigger>
                 <div className="relative">
                     <Bell className="text-primary" />

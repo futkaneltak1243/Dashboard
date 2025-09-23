@@ -8,6 +8,9 @@ import { useTheme } from './contexts/theme-context/ThemeContextProvider'
 import { FilterBar } from './components/Filter'
 import { Notification } from './components/Notification'
 import { AccountMenu } from './components/AccountMenu'
+import { Header } from './components/Header'
+import { Chart, StatGrid } from './components/analytics'
+import { User2 } from "lucide-react"
 
 function App() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
@@ -47,6 +50,7 @@ function App() {
         </Sidebar>
 
         <div className='flex flex-col flex-1 min-w-0'>
+          <Header></Header>
           <div>
 
 
@@ -151,6 +155,17 @@ function App() {
               <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
 
             </AccountMenu>
+
+
+            {/* <Chart></Chart> */}
+            <StatGrid>
+              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
+              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
+              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
+              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="down" lastDifference='yesterday' percent={8.5} />
+
+
+            </StatGrid>
 
 
           </div>

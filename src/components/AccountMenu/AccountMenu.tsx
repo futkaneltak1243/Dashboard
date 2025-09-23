@@ -1,12 +1,14 @@
 import type { ElementType, FC, ReactNode } from "react"
 import { TriggerWithPopover } from "../TriggerWithPopover";
 import { ChevronDown } from "lucide-react"
+import { cn } from "../classNames"
 
 interface AccountMenuProps {
     name: string;
     role: string;
     avatar: string;
     children?: ReactNode;
+    className?: string;
 }
 
 interface ItemProps {
@@ -17,18 +19,18 @@ interface ItemProps {
 
 const AccountMenu: FC<AccountMenuProps> & {
     Item: FC<ItemProps>
-} = ({ name, role, avatar, children }) => {
+} = ({ name, role, avatar, children, className }) => {
     return (
-        <TriggerWithPopover className="flex">
+        <TriggerWithPopover className={cn("flex", className)}>
             <TriggerWithPopover.Trigger>
                 <div className="flex items center">
-                    <div className="mr-[16px]">
+                    <div className="mr-0 md:mr-[16px]">
                         <img
                             src={avatar}
                             className="w-[44px] h-[44px] rounded-full"
                         ></img>
                     </div>
-                    <div className=" hidden sm:flex">
+                    <div className=" hidden md:flex">
                         <div className="mr-[26px] flex flex-col items-start justify-around">
                             <p className="text-sm font-semibold text-text-light dark:text-text-dark">{name}</p>
                             <p className="text-xs text-text-light dark:text-text-dark">{role}</p>
