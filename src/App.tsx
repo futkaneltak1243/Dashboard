@@ -11,10 +11,16 @@ import { AccountMenu } from './components/AccountMenu'
 import { Header } from './components/Header'
 import { Chart, StatGrid } from './components/analytics'
 import { User2 } from "lucide-react"
+import { Products } from "./components/Products"
 
 function App() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const images = [
+    "https://picsum.photos/360/320",
+    "https://picsum.photos/540/420",
+    "https://picsum.photos/760/520",
+  ]
 
   return (
     <Dashboard >
@@ -49,7 +55,7 @@ function App() {
 
         </Sidebar>
 
-        <div className='flex flex-col flex-1 min-w-0'>
+        <div className='flex flex-col flex-1 min-w-0 overflow-y-scroll max-h-screen'>
           <Header></Header>
           <div>
 
@@ -148,24 +154,19 @@ function App() {
 
             </Notification>
 
-            <AccountMenu avatar='https://avatar.iran.liara.run/public' name="Furkan" role='Admin' >
-              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
-              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
-              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
-              <AccountMenu.Item label='Manage Account' Icon={Settings} onClick={() => null} />
-
-            </AccountMenu>
 
 
-            {/* <Chart></Chart> */}
-            <StatGrid>
-              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
-              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
-              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="up" lastDifference='yesterday' percent={8.5} />
-              <StatGrid.StatCard iconColor="yellow" Icon={User2} title='Total User' value={"40,689"} direction="down" lastDifference='yesterday' percent={8.5} />
+            <Products>
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
+              <Products.Product images={images} title='Apple Watch Series 4 ' price={120} isFavorites={false} />
 
 
-            </StatGrid>
+
+            </Products>
 
 
           </div>
