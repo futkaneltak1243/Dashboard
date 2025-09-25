@@ -1,10 +1,10 @@
+import { useSidebar } from "../../contexts/sidebar-context/SidebarContextProvider";
 import { cn } from "../classNames";
 import type { FC, ReactNode, ElementType } from "react";
 
 interface SidebarProps {
     className?: string;
     children: ReactNode;
-    open: boolean;
 }
 
 interface NavItemProps {
@@ -128,14 +128,15 @@ const Sidebar: FC<SidebarProps> & {
     Header: FC<HeaderProps>;
     Separator: FC<SeparatorProps>;
     Title: FC<TitleProps>;
-} = (({ className, children, open }) => {
+} = (({ className, children }) => {
+    const { isSidebarOpen } = useSidebar()
     return (
         <div
             className={cn(
                 "h-screen overflow-auto bg-items-light dark:bg-items-dark shadow-md transition-all duration-150 -translate-x-full sm:relative fixed top-0 w-[240px] left-0 z-30 sm:block sm:translate-0 sm:w-[86px]",
                 className,
                 {
-                    " sm:w-[240px] translate-x-0": open
+                    " sm:w-[240px] translate-x-0": isSidebarOpen
                 }
             )}
         >
