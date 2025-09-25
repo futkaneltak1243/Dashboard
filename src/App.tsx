@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { Layout } from "./pages"
+import { Layout, Dashboard } from "./pages"
 
 
 const router = createBrowserRouter([
@@ -7,7 +7,10 @@ const router = createBrowserRouter([
     path: '/',
     Component: Layout,
     children: [
-
+      {
+        index: true,
+        Component: Dashboard
+      }
     ]
   }
 ])

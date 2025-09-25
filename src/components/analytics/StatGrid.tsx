@@ -36,7 +36,7 @@ const iconContainerVariants = cva(
 )
 
 const iconVariants = cva(
-    "md-stats:w-[32px] md-stats:h-[32px] w-[25px] h-[25px] dark:text-white opacity-100",
+    "md-stats:w-[32px] md-stats:h-[32px] w-[25px] h-[25px] dark:text-white opacity-100 ",
     {
         variants: {
             iconColor: {
@@ -54,7 +54,7 @@ const iconVariants = cva(
 
 const StatCard: FC<StatCardProps> = ({ title, value, className, direction, percent, lastDifference, Icon, iconColor }) => {
     return (
-        <div className={cn("md-stats:w-[262px] md-stats:h-[161px] m-w-[196px] min-w-[140px] h-[120px] rounded-2xl bg-items-light dark:bg-items-dark shadow-sm md-stats:p-[16px] p-[10px] flex flex-col items-start justify-between hover:-translate-y-2 transition-all duration-300",
+        <div className={cn("w-full h-[140px] md:h-[160px]  rounded-2xl bg-items-light dark:bg-items-dark shadow-sm md-stats:p-[16px] p-[10px] flex flex-col items-start justify-between hover:-translate-y-2 transition-all duration-300 ",
             className
         )}>
             <div className="flex items-start justify-between w-full">
@@ -92,7 +92,7 @@ const StatGrid: FC<StatGridProps> & {
 } = ({ children }) => {
     return (
         <div className="flex items center justify-center w-full">
-            <div className="grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 mx-2 gap-[15px] lg:gap-[30px]">
+            <div className="w-full grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2  gap-[15px] lg:gap-[30px]">
                 {children}
             </div>
 

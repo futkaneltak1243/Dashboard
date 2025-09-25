@@ -1,6 +1,7 @@
 import { useSidebar } from "../../contexts/sidebar-context/SidebarContextProvider";
 import { cn } from "../classNames";
 import type { FC, ReactNode, ElementType } from "react";
+import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
     className?: string;
@@ -11,9 +12,7 @@ interface NavItemProps {
     className?: string;
     Icon: ElementType;
     title: string;
-    open: boolean;
-    selected?: boolean;
-    onClick: () => void;
+    to: string;
 }
 interface SeparatorProps {
     className?: string;
@@ -32,58 +31,59 @@ interface HeaderProps {
 }
 
 
-const NavItem: FC<NavItemProps> = ({
-    className,
-    Icon,
-    title,
-    open,
-    selected,
-    onClick,
-}) => {
-    return (
-        <button
-            className={cn(
-                "w-full h-[50px] flex items-center justify-center relative cursor-pointer",
-                className
-            )}
-            onClick={onClick}
-        >
-            <div
-                className={cn(
-                    "h-full flex items-center rounded-[6px] transition-all duration-150",
-                    open ? "w-[192px]" : "w-full justify-center",
-                    selected && open ? "bg-primary" : ""
-                )}
-            >
-                <Icon
-                    className={cn(
-                        "mx-[16px] w-[22px] h-[26px] transition-all duration-150",
-                        {
-                            "text-white dark:text-white ": selected && open,
-                            "text-primary": selected && !open,
-                            "text-black dark:text-white": !selected && open,
-                            "text-gray-400": !selected && !open,
-                        }
-                    )}
-                />
-                <p
-                    className={cn(
-                        "text-[14px] dark:text-white transition-all duration-150",
-                        open ? "" : "hidden",
-                        selected ? "text-white" : "text-[#202224]"
-                    )}
-                >
-                    {title}
-                </p>
-            </div>
+const NavItem: FC<NavItemProps> = ({ className, Icon, title, to }) => {
+    const { isSidebarOpen } = useSidebar();
 
-            <div
-                className={cn(
-                    "w-[9px] h-full absolute top-0 left-[-5px] bg-primary rounded-full",
-                    selected ? "block" : "hidden"
-                )}
-            />
-        </button>
+    return (
+        <NavLink
+            to={to}
+            className={
+                cn(
+                    "w-full h-[50px] flex items-center justify-center relative cursor-pointer",
+                    className
+                )
+            }
+        >
+            {({ isActive }) => (
+                <>
+                    <div
+                        className={cn(
+                            "h-full flex items-center rounded-[6px] transition-all duration-150",
+                            isSidebarOpen ? "w-[192px]" : "w-full justify-center",
+                            isActive && isSidebarOpen ? "bg-primary" : ""
+                        )}
+                    >
+                        <Icon
+                            className={cn(
+                                "mx-[16px] w-[22px] h-[26px] transition-all duration-150",
+                                {
+                                    "text-white dark:text-white ": isActive && isSidebarOpen,
+                                    "text-primary": isActive && !isSidebarOpen,
+                                    "text-black dark:text-white": !isActive && isSidebarOpen,
+                                    "text-gray-400": !isActive && !isSidebarOpen,
+                                }
+                            )}
+                        />
+                        <p
+                            className={cn(
+                                "text-[14px] dark:text-white transition-all duration-150",
+                                isSidebarOpen ? "" : "hidden",
+                                isActive ? "text-white" : "text-[#202224]"
+                            )}
+                        >
+                            {title}
+                        </p>
+                    </div>
+
+                    <div
+                        className={cn(
+                            "w-[9px] h-full absolute top-0 left-[-5px] bg-primary rounded-full",
+                            isActive ? "block" : "hidden"
+                        )}
+                    />
+                </>
+            )}
+        </NavLink>
     );
 };
 

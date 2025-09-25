@@ -6,10 +6,9 @@ const Chart = () => {
     const data = crateData()
 
     return (
-        <div className='bg-white rounded-2xl mx-0 md:mx-[33px]'>
+        <div className='bg-items-light dark:bg-items-dark rounded-2xl'>
             <div className='w-full flex py-[37px] px-[32px] items-center justify-between'>
-                <p className='font-semibold text-xl'>Revenue</p>
-                <p>Revenue</p>
+                <p className='font-semibold text-xl text-text-light dark:text-text-dark'>Revenue</p>
             </div>
             <div className=' block h-[278px]'>
                 <ResponsiveContainer width="100%" height="100%">
@@ -36,11 +35,11 @@ const Chart = () => {
             <div className='w-full py-[31px] flex items-center justify-center'>
                 <div className='mr-[58px] flex items-center'>
                     <div className='w-[12px] h-[12px] bg-[#F9978A] mr-[16px] rounded-full'></div>
-                    <div className='text-md font-semibold'>Sales</div>
+                    <div className='text-md font-semibold text-text-light dark:text-text-dark'>Sales</div>
                 </div>
                 <div className='flex items-center'>
-                    <div className='w-[12px] h-[12px] bg-[#E3B9FF] mr-[16px] rounded-full'></div>
-                    <div className='text-md font-semibold'>Profit</div>
+                    <div className='w-[12px] h-[12px] bg-[#E3B9FF] mr-[16px] rounded-full '></div>
+                    <div className='text-md font-semibold text-text-light dark:text-text-dark'>Profit</div>
                 </div>
 
             </div>
