@@ -89,7 +89,7 @@ const Product: FC<ProductProps> = ({ images, title, price, isFavorites }) => {
                 </div>
                 <div className="flex-1 flex justify-end ">
                     <button className="w-[20px] h-[20px] sm:w-[30px] sm:h-[30px] lg:w-[44px] lg:h-[44px] bg-[#F9F9F9] flex items-center justify-center rounded-full cursor-pointer dark:bg-items-dark2">
-                        <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6  text-red-500",
+                        <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4 md:w-5 lg:w-6 md:h-5 lg:h-6  text-red-500",
                             {
                                 "fill-current": isFavorites
                             }
@@ -110,7 +110,7 @@ const Products: FC<ProductsProps> & {
     Product: FC<ProductProps>
 } = ({ children }) => {
     return (
-        <div className="flex items-center justify-center w-full px-5 md:px-10">
+        <div className="flex items-center justify-center w-full ">
             <div className="grid gap-[15px] md:gap-[30px] xl:grid-cols-3 grid-cols-2 w-full">
                 {children}
             </div>
