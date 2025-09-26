@@ -111,7 +111,7 @@ const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = fa
         let newY: number;
         if (side) {
             largeScreenX = Math.max(x + window.scrollX + width + offsetX, 0)
-            newY = y
+            newY = y + window.scrollY
         } else {
             largeScreenX = Math.max(x + window.scrollX + width / 2 - rect.width / 2 + offsetX, 0);
             newY = y + window.scrollY + height + offsetY;
@@ -137,7 +137,9 @@ const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = fa
         };
 
         window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize)
+        };
     }, [popoverOpen, fullOnSmallScreen, setPopoverOpen]);
 
 

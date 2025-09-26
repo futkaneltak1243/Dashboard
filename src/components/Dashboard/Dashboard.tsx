@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from "react";
 import { cn } from "../classNames";
+import { useSidebar } from "../../contexts/sidebar-context/SidebarContextProvider";
 
 interface DashboardProps {
     children: ReactNode;
@@ -18,7 +19,7 @@ const Dashboard: FC<DashboardProps> & {
 }) => {
         return (
             <div
-                className={cn("w-screen h-screen bg-layout-light dark:bg-layout-dark flex", className)}
+                className={cn("w-screen min-h-screen bg-layout-light dark:bg-layout-dark flex", className)}
             >
                 {children}
             </div>
@@ -26,9 +27,13 @@ const Dashboard: FC<DashboardProps> & {
     };
 
 const Content: FC<ContentProps> = ({ children }) => {
+    const { isSidebarOpen } = useSidebar()
     return (
         <div
-            className="h-full overflow-scroll flex-1"
+            className={cn("h-full flex-1 relative transition-all duration-150", {
+                "sm:pl-[86px]": !isSidebarOpen,
+                "sm:pl-[240px]": isSidebarOpen
+            })}
         >
             {children}
         </div>

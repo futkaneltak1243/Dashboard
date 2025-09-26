@@ -34,7 +34,7 @@ interface PopoverProps {
 interface OptionProps {
     className?: string;
     selected: boolean;
-    buttonClick?: () => void;
+    onClick?: () => void;
     label: string;
 }
 
@@ -88,6 +88,7 @@ const FilterBar: FC<FilterBarProps> & {
 
                 })}>
                     <FilterIconBox placement='left' />
+                    <FilterByBox />
                     {children}
 
                 </div>
@@ -156,6 +157,18 @@ const FilterIconBox: FC<FilterIconBoxProps> = ({ className, placement }) => {
         </div>
     )
 
+}
+
+const FilterByBox: FC = () => {
+    return (
+        <div
+            className={cn(
+                "flex items-center justify-center bg-items-light dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative border-lightgray dark:border-darkgray border h-[70px] text-sm  p-[26px] w-auto border-l-0",
+            )}
+        >
+            Filter By
+        </div>
+    )
 }
 
 export const ActionBox: FC<ActionBoxProps> = ({ className, children, placement, breakPoint = 'sm' }) => {
@@ -306,7 +319,7 @@ const Popover: FC<PopoverProps> = ({ className, title, description, children, bu
 
 }
 
-const Option: FC<OptionProps> = ({ className, label, buttonClick, selected }) => {
+const Option: FC<OptionProps> = ({ className, label, onClick, selected }) => {
     return (
         <button
             className={cn(" w-[147px] h-[34px] cursor-pointer rounded-full border dark:border-midgray border-darkgray text-text-light dark:text-text-dark text-xs md:text-sm",
@@ -315,7 +328,7 @@ const Option: FC<OptionProps> = ({ className, label, buttonClick, selected }) =>
                     "bg-primary border-none text-white": selected
                 }
             )}
-            onClick={buttonClick}
+            onClick={onClick}
         >
             {label}
         </button>

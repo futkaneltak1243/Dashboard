@@ -2,7 +2,7 @@ import { Dashboard } from "../components/Dashboard"
 import { Sidebar } from "../components/Sidebar"
 import { Header } from "../components/Header"
 import { Outlet } from "react-router-dom"
-import { Gauge } from "lucide-react"
+import { Gauge, UsersRound } from "lucide-react"
 
 const Layout = () => {
     return (
@@ -12,6 +12,8 @@ const Layout = () => {
                     Furkan
                 </Sidebar.Header>
                 <Sidebar.NavItem Icon={Gauge} title="Dashboard" to="/" />
+                <Sidebar.NavItem Icon={UsersRound} title="Users" to="/users" />
+
             </Sidebar>
             <Dashboard.Content>
                 <Header></Header>

@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { Layout, Dashboard } from "./pages"
+import { Layout, Dashboard, Users } from "./pages"
 
 
 const router = createBrowserRouter([
@@ -10,6 +10,10 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Dashboard
+      },
+      {
+        path: '/users',
+        Component: Users
       }
     ]
   }
