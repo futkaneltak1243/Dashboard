@@ -1,8 +1,9 @@
-import { type ReactNode, type FC, createContext, useContext, useEffect, useState } from "react";
-import { ChevronDown, ChevronRight, Funnel, RotateCcw } from "lucide-react";
+import { type ReactNode, type FC, createContext, useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight, Funnel, RotateCcw } from "lucide-react";
 import { cn } from "../classNames";
 import { Button as Bn } from "../Button";
 import { TriggerWithPopover } from "../TriggerWithPopover";
+import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, startOfMonth, startOfWeek, subMonths } from "date-fns"
 
 
 type BreakPoint = 'sm' | 'md' | 'lg' | 'xl';
@@ -18,6 +19,13 @@ interface ButtonProps {
     label: string;
     placement?: "left" | "middle" | "right";
 }
+
+
+interface DateButtonProps {
+    className?: string;
+    placement?: "left" | "middle" | "right";
+}
+
 
 interface PopoverProps {
     className?: string;
@@ -60,6 +68,27 @@ interface FilterRestartActionBoxProps {
     placement: Placement;
 }
 
+interface DateFilterProps {
+    children: ReactNode;
+}
+
+interface DatePopoverProps {
+    className?: string;
+    description: string;
+    buttonClick: () => void;
+    buttonLabel: string;
+    fullOnSmallScreen?: boolean;
+    offsetY?: number;
+    offsetX?: number;
+    chosenDates: Date[];
+    setChosenDates: Dispatch<SetStateAction<Date[]>>
+}
+
+interface IChosenDateContext {
+    chosenDate: string;
+    setChosenDate: (chosenDate: string) => void
+}
+
 const BreakPointContext = createContext<BreakPoint | undefined>(undefined)
 
 const useBreakPoint = () => {
@@ -72,7 +101,10 @@ const FilterBar: FC<FilterBarProps> & {
     Filter: FC<FilterProps>,
     Button: FC<ButtonProps>,
     Popover: FC<PopoverProps>,
-    Option: FC<OptionProps>
+    Option: FC<OptionProps>,
+    DateFilter: FC<DateFilterProps>,
+    DateButton: FC<DateButtonProps>,
+    DatePopover: FC<DatePopoverProps>
 } = ({ children, breakPoint }) => {
 
     const contextValue: BreakPoint = breakPoint
@@ -250,7 +282,7 @@ const Button: FC<ButtonProps> =
 
 const Popover: FC<PopoverProps> = ({ className, title, description, children, buttonClick, buttonLabel, fullOnSmallScreen = false, offsetY = 0, offsetX = 0 }) => {
 
-    const [isScreenSmal, setIsScreenSmall] = useState<boolean>(false)
+    const [isScreenSmall, setIsScreenSmall] = useState<boolean>(false)
     const breakPoint = useBreakPoint()
 
 
@@ -292,8 +324,8 @@ const Popover: FC<PopoverProps> = ({ className, title, description, children, bu
                 className)}
             fullOnSmallScreen={fullOnSmallScreen}
             offsetY={offsetY}
-            offsetX={isScreenSmal ? offsetX + 4 : offsetX}
-            side={isScreenSmal}
+            offsetX={isScreenSmall ? offsetX + 4 : offsetX}
+            side={isScreenSmall}
         >
             <h1 className="pt-3 pl-[24px] font-semibold text-lg text-left">
                 {title}
@@ -335,10 +367,161 @@ const Option: FC<OptionProps> = ({ className, label, onClick, selected }) => {
     )
 }
 
+const ChosenDateContext = createContext<IChosenDateContext | undefined>(undefined)
 
+const useChosenDate = () => {
+    const context = useContext(ChosenDateContext);
+    if (context === undefined) throw new Error("DateButton and DatePopover should be used within dateFilter Component");
+    return context
+}
+
+const DateFilter: FC<DateFilterProps> = ({ children }) => {
+    const [chosenDate, setChosenDate] = useState<string>("")
+    return (
+        <ChosenDateContext.Provider value={{ chosenDate, setChosenDate }}>
+            <TriggerWithPopover>
+                {children}
+            </TriggerWithPopover>
+        </ChosenDateContext.Provider>
+    )
+}
+
+
+const DateButton: FC<DateButtonProps> = ({ className, placement = "middle" }) => {
+    const { chosenDate } = useChosenDate()
+    return <Button label={chosenDate || "Date"} className={className} placement={placement} />
+}
+
+const DatePopover: FC<DatePopoverProps> = ({ className, description, buttonClick, buttonLabel, fullOnSmallScreen = false, offsetY = 0, offsetX = 0, chosenDates, setChosenDates }) => {
+
+    const [isScreenSmall, setIsScreenSmall] = useState<boolean>(false)
+    const breakPoint = useBreakPoint()
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+
+    const toggleDay = (day: Date) => {
+        setChosenDates((prev: Date[]) => {
+            const exists = prev.some((d: Date) => isSameDay(d, day))
+
+            if (exists) {
+                return prev.filter((d: Date) => !isSameDay(d, day))
+            }
+            return [...prev, day]
+        })
+    }
+
+    const renderDays = () => {
+        const startDay = startOfWeek(startOfMonth(currentMonth))
+        const endDay = endOfWeek(endOfMonth(currentMonth))
+        const days = eachDayOfInterval({ start: startDay, end: endDay })
+
+        return (days.map((day: Date) => {
+            return (
+                <div
+                    key={day.toString()}
+                    className={cn("text-center text-text-light p-[8px] sm:p-[11px] rounded-md dark:text-text-dark cursor-pointer",
+                        {
+                            "bg-primary text-white": chosenDates.some((d) => isSameDay(d, day))
+                        }
+                    )}
+                    onClick={() => toggleDay(day)}
+
+                >
+                    {format(day, "d")}
+                </div>
+            )
+        }))
+
+    }
+
+    useEffect(() => {
+
+        let screenSize: number;
+        switch (breakPoint) {
+            case "sm":
+                screenSize = 640;
+                break;
+            case "md":
+                screenSize = 768;
+                break;
+            case "lg":
+                screenSize = 1024;
+                break;
+            case "xl":
+                screenSize = 1280;
+                break;
+        }
+
+        const handleResize = () => {
+            setIsScreenSmall(window.innerWidth < screenSize)
+        }
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize)
+
+        return (() => {
+            window.removeEventListener('resize', handleResize)
+        })
+    }, [])
+
+    return (
+        <TriggerWithPopover.Popover
+            className={cn("rounded-xl bg-items-light dark:bg-items-dark2 sm:w-[387px] min-w-[270px]   absolute shadow-2xl text-text-light dark:text-text-dark",
+                className)}
+            fullOnSmallScreen={fullOnSmallScreen}
+            offsetY={offsetY}
+            offsetX={isScreenSmall ? offsetX + 4 : offsetX}
+            side={isScreenSmall}
+        >
+            <div className="py-[25px] px-[31px] flex items-center justify-between">
+                <h1 className=" font-semibold text-sm text-left">{format(currentMonth, "MMMM yyyy")}</h1>
+                <div className="flex">
+                    <button
+                        className="w-[22px] h-[22px] bg-[#E7E9EE] dark:bg-[#475365] mr-[12px] rounded-sm flex items-center justify-center cursor-pointer"
+                        onClick={() => { setCurrentMonth(subMonths(currentMonth, 1)) }}
+                    >
+                        <ChevronLeft className="text-black dark:text-lightgray" />
+                    </button>
+                    <button
+                        className="w-[22px] h-[22px] bg-[#E7E9EE] dark:bg-[#475365] rounded-sm flex items-center justify-center cursor-pointer"
+                        onClick={() => { setCurrentMonth(addMonths(currentMonth, 1)) }}
+                    >
+                        <ChevronRight className="text-black dark:text-lightgray" />
+
+                    </button>
+                </div>
+
+            </div>
+
+            <div className="h-[1px] w-full mb-[16px] bg-midgray"></div>
+
+            <div className="pb-5 px-[15px] sm:px-[37px] items-center justify-center grid grid-cols-7 gap-[1px] sm:gap-[2px]">
+                {"SMTWTFS".split("").map((c: string, index) => {
+                    return <div key={index} className="text-center mb-[3px]">{c}</div>
+                })}
+                {renderDays()}
+            </div>
+            <div className="h-[1px] w-full mb-[16px] bg-midgray"></div>
+            <div className="text-midgray mb-[32px] pl-[24px] text-left text-sm">
+                {description}
+            </div>
+            <div className="flex items-center justify-center pb-[24px]">
+                <TriggerWithPopover.Close>
+                    <Bn variant="default" size="md" onClick={buttonClick}>
+                        {buttonLabel}
+                    </Bn>
+                </TriggerWithPopover.Close>
+            </div>
+        </TriggerWithPopover.Popover>
+    )
+}
+
+FilterBar.DatePopover = DatePopover
 FilterBar.Filter = Filter;
 FilterBar.Button = Button;
 FilterBar.Popover = Popover;
-FilterBar.Option = Option
+FilterBar.Option = Option;
+FilterBar.DateFilter = DateFilter;
+FilterBar.DateButton = DateButton
 
 export default FilterBar;
