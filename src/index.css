@@ -34,3 +34,7 @@
 
   --breakpoint-xs-products-slider-buttons: 400px
 }
+
+body {
+  overscroll-behavior: none;
+}

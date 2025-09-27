@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import { FilterBar } from "../components/Filter";
 import { Table } from "../components/Table";
-import { DatePicker } from "../components/DatePicker";
 
 type Order = {
     id: number;
@@ -79,7 +78,6 @@ const Orders = () => {
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Orders</h1>
-            <DatePicker></DatePicker>
             <div className="mt-7">
                 <FilterBar breakPoint='md'>
                     <FilterBar.Filter >
