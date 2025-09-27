@@ -150,7 +150,7 @@ const Products = () => {
                 <Button>Add Product</Button>
             </div>
             <div className="mt-7">
-                <Searchbar size="sm" placeholder="Search Product..." />
+                <Searchbar color="default" size="sm" placeholder="Search Product..." />
             </div>
             <div className="mt-4">
                 <Ps>

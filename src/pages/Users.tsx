@@ -70,7 +70,7 @@ const Users = () => {
                 </FilterBar>
             </div>
             <div className="mt-4 flex justify-end">
-                <Searchbar size="sm" placeholder="Search By Name..." />
+                <Searchbar color="default" size="sm" placeholder="Search Product..." />
             </div>
             <div className="mt-4">
                 <Table>

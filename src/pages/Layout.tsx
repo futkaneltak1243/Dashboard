@@ -2,7 +2,7 @@ import { Dashboard } from "../components/Dashboard"
 import { Sidebar } from "../components/Sidebar"
 import { Header } from "../components/Header"
 import { Outlet } from "react-router-dom"
-import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart } from "lucide-react"
+import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar } from "lucide-react"
 
 const Layout = () => {
     return (
@@ -16,6 +16,10 @@ const Layout = () => {
                 <Sidebar.NavItem Icon={Package} title="Products" to="/products" />
                 <Sidebar.NavItem Icon={Heart} title="Favorites" to="/favorites" />
                 <Sidebar.NavItem Icon={SquareMenu} title="Orders" to="/orders" />
+                <Sidebar.NavItem Icon={Handshake} title="Partners" to="/partners" />
+                <Sidebar.NavItem Icon={Calendar} title="Exhibitions" to="/exhibitions" />
+
+
                 <Sidebar.Separator />
                 <Sidebar.NavItem Icon={Settings} title="Settings" to="/settings" />
 

@@ -150,7 +150,7 @@ const Favorites = () => {
             <h1 className="text-text-light dark:text-text-dark text-3xl">Favorites</h1>
 
             <div className="mt-7 w-full flex justify-end">
-                <Searchbar size="sm" placeholder="Search Product..." />
+                <Searchbar color="default" size="sm" placeholder="Search Product..." />
             </div>
             <div className="mt-4">
                 <Ps>
