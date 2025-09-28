@@ -8,7 +8,6 @@ import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay,
 
 type BreakPoint = 'sm' | 'md' | 'lg' | 'xl';
 
-type Placement = "left" | "middle" | "right"
 
 interface FilterProps {
     children: ReactNode;
@@ -17,13 +16,11 @@ interface FilterProps {
 interface ButtonProps {
     className?: string;
     label: string;
-    placement?: "left" | "middle" | "right";
 }
 
 
 interface DateButtonProps {
     className?: string;
-    placement?: "left" | "middle" | "right";
 }
 
 
@@ -49,7 +46,6 @@ interface OptionProps {
 interface ActionBoxProps {
     className?: string;
     children: ReactNode;
-    placement: Placement;
     breakPoint?: BreakPoint;
 }
 
@@ -60,12 +56,10 @@ interface FilterBarProps {
 
 interface FilterIconBoxProps {
     className?: string;
-    placement: Placement;
 }
 
 interface FilterRestartActionBoxProps {
     className?: string;
-    placement: Placement;
 }
 
 interface DateFilterProps {
@@ -111,15 +105,15 @@ const FilterBar: FC<FilterBarProps> & {
 
     return (
         <BreakPointContext.Provider value={contextValue}>
-            <div className="flex items-center">
-                <div className={cn("hidden items-center", {
+            <div className="flex items-center border border-lightgray dark:border-darkgray w-fit rounded-xl overflow-hidden divide-x divide-lightgray dark:divide-darkgray">
+                <div className={cn("hidden items-center divide-x divide-lightgray dark:divide-darkgray", {
                     "sm:flex": breakPoint === "sm",
                     "md:flex": breakPoint === "md",
                     "lg:flex": breakPoint === "lg",
                     "xl:flex": breakPoint === "xl",
 
                 })}>
-                    <FilterIconBox placement='left' />
+                    <FilterIconBox />
                     <FilterByBox />
                     {children}
 
@@ -132,7 +126,7 @@ const FilterBar: FC<FilterBarProps> & {
 
                 })}>
                     <TriggerWithPopover.Trigger >
-                        <FilterIconBox placement='left' />
+                        <FilterIconBox />
                     </TriggerWithPopover.Trigger>
                     <TriggerWithPopover.Popover className="z-10" offsetX={50}>
                         <div className="flex flex-col rounded-xl overflow-hidden border border-lightgray divide-lightgray dark:border-darkgray dark:divide-darkgray divide-y">
@@ -142,25 +136,18 @@ const FilterBar: FC<FilterBarProps> & {
                     </TriggerWithPopover.Popover>
                 </TriggerWithPopover>
 
-                <FilterRestartActionBox placement="right" />
+                <FilterRestartActionBox />
             </div>
         </BreakPointContext.Provider>
     )
 }
 
-const FilterRestartActionBox: FC<FilterRestartActionBoxProps> = ({ className, placement }) => {
+const FilterRestartActionBox: FC<FilterRestartActionBoxProps> = ({ className }) => {
     return (
         <div
             className={cn(
-                "flex items-center justify-center bg-items-light dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative border-lightgray dark:border-darkgray border h-[70px] text-sm  p-[26px] w-auto",
-                className,
-                {
-                    "rounded-l-lg": placement === "left",
-                    "border-l-0": placement === "middle",
-                    "border-l-0 rounded-r-lg": placement === "right",
-
-                }
-            )}
+                "flex items-center justify-center bg-[#F9F9FB] dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative  h-[70px] text-sm  p-[26px] w-auto",
+                className)}
         >
             <div className='items-center flex justify-center'>
                 <RotateCcw size={15} className='mr-3'></RotateCcw>
@@ -170,19 +157,12 @@ const FilterRestartActionBox: FC<FilterRestartActionBoxProps> = ({ className, pl
     )
 }
 
-const FilterIconBox: FC<FilterIconBoxProps> = ({ className, placement }) => {
+const FilterIconBox: FC<FilterIconBoxProps> = ({ className }) => {
     return (
         <div
             className={cn(
-                "flex items-center justify-center bg-items-light dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative border-lightgray dark:border-darkgray border h-[70px] text-sm  p-[26px] w-auto",
-                className,
-                {
-                    "rounded-l-lg": placement === "left",
-                    "border-l-0": placement === "middle",
-                    "border-l-0 rounded-r-lg": placement === "right",
-
-                }
-            )}
+                "flex items-center justify-center bg-[#F9F9FB] dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative h-[70px] text-sm  p-[26px] w-auto",
+                className)}
         >
             <Funnel className='w-[16px] h-[16px] md:w-[20px] md:h-[20px]'></Funnel>
 
@@ -195,7 +175,7 @@ const FilterByBox: FC = () => {
     return (
         <div
             className={cn(
-                "flex items-center justify-center bg-items-light dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative border-lightgray dark:border-darkgray border h-[70px] text-sm  p-[26px] w-auto border-l-0",
+                "flex items-center justify-center bg-[#F9F9FB] dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative h-[70px] text-sm  p-[26px] w-auto ",
             )}
         >
             Filter By
@@ -203,20 +183,18 @@ const FilterByBox: FC = () => {
     )
 }
 
-export const ActionBox: FC<ActionBoxProps> = ({ className, children, placement, breakPoint = 'sm' }) => {
+export const ActionBox: FC<ActionBoxProps> = ({ className, children, breakPoint = 'sm' }) => {
     return (
         <div
             className={cn(
-                "flex items-center justify-center bg-items-light dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative  h-12 w-40",
+                "flex items-center justify-center bg-[#F9F9FB] dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative  h-12 w-40",
                 className,
                 {
-                    "rounded-l-lg": placement === "left",
-                    "border-l-0": placement === "middle",
-                    "border-l-0 rounded-r-lg": placement === "right",
-                    "sm:h-[70px] sm:text-sm sm:p-[15px] lg:p-[26px] sm:w-auto sm:border sm:border-lightgray sm:dark:border-darkgray": breakPoint === 'sm',
-                    "md:h-[70px] md:text-sm md:p-[15px] lg:p-[26px] md:w-auto md:border md:border-lightgray md:dark:border-darkgray": breakPoint === 'md',
-                    "lg:h-[70px] lg:text-sm  lg:p-[26px] lg:w-auto lg:border lg:border-lightgray lg:dark:border-darkgray": breakPoint === 'lg',
-                    "xl:h-[70px] xl:text-sm  xl:p-[26px] xl:w-auto xl:border xl:border-lightgray xl:dark:border-darkgray": breakPoint === 'xl',
+
+                    "sm:h-[70px] sm:text-sm sm:p-[15px] lg:p-[26px] sm:w-auto ": breakPoint === 'sm',
+                    "md:h-[70px] md:text-sm md:p-[15px] lg:p-[26px] md:w-auto ": breakPoint === 'md',
+                    "lg:h-[70px] lg:text-sm  lg:p-[26px] lg:w-auto ": breakPoint === 'lg',
+                    "xl:h-[70px] xl:text-sm  xl:p-[26px] xl:w-auto ": breakPoint === 'xl',
 
 
                 }
@@ -243,14 +221,14 @@ const Filter: FC<FilterProps> = ({ children }) => {
 
 
 const Button: FC<ButtonProps> =
-    ({ label, className, placement = "middle" }) => {
+    ({ label, className }) => {
 
         const breakPoint = useBreakPoint()
 
         return (
             <>
                 <TriggerWithPopover.Trigger>
-                    <ActionBox className={className} placement={placement} breakPoint={breakPoint}>
+                    <ActionBox className={className} breakPoint={breakPoint}>
                         <div className=" flex items-center h-full">
                             <div className="mr-[0px] md:mr-[20px] sm:mr-[10px]">{label}</div>
                             <ChevronDown className={cn("w-[16px] h-[16px] hidden",
@@ -387,9 +365,9 @@ const DateFilter: FC<DateFilterProps> = ({ children }) => {
 }
 
 
-const DateButton: FC<DateButtonProps> = ({ className, placement = "middle" }) => {
+const DateButton: FC<DateButtonProps> = ({ className }) => {
     const { chosenDate } = useChosenDate()
-    return <Button label={chosenDate || "Date"} className={className} placement={placement} />
+    return <Button label={chosenDate || "Date"} className={className} />
 }
 
 const DatePopover: FC<DatePopoverProps> = ({ className, description, buttonClick, buttonLabel, fullOnSmallScreen = false, offsetY = 0, offsetX = 0, chosenDates, setChosenDates }) => {
