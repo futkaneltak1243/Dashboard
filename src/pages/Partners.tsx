@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react";
+import { ActionButtons } from "../components/ActionButtons";
 import { Button } from "../components/Button"
 import { Searchbar } from "../components/Searchbar"
 import { Table } from "../components/Table"
@@ -185,6 +187,9 @@ const Partners = () => {
                             <Table.HeadCell>
                                 JOIND
                             </Table.HeadCell>
+                            <Table.HeadCell>
+                                Actions
+                            </Table.HeadCell>
 
                         </Table.HeadRow>
                     </Table.Head>
@@ -202,10 +207,22 @@ const Partners = () => {
                                         {partner.email}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {partner.type}
+                                        <Table.Status color={partner.type === "Partner" ? "red"
+                                            : partner.type === "Investor" ? "blue"
+                                                : partner.type === "Supplier" ? "green"
+                                                    : "yellow"
+                                        }>
+                                            {partner.type}
+                                        </Table.Status>
                                     </Table.Cell>
                                     <Table.Cell>
                                         {partner.joined}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <ActionButtons>
+                                            <ActionButtons.Button Icon={SquarePen} type="icon" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                        </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>
                             )
@@ -213,6 +230,12 @@ const Partners = () => {
 
                     </Table.Body>
                 </Table>
+                <div className="flex justify-end mt-[20px]">
+                    <ActionButtons>
+                        <ActionButtons.Button type="icon" Icon={ChevronLeft} />
+                        <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                    </ActionButtons>
+                </div>
 
             </div>
         </div>

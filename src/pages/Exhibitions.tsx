@@ -1,6 +1,8 @@
+import { ActionButtons } from "../components/ActionButtons"
 import { Button } from "../components/Button"
 import { Searchbar } from "../components/Searchbar"
 import { Table } from "../components/Table"
+import { ChevronLeft, ChevronRight, MapPin, SquarePen, Trash2 } from "lucide-react"
 
 type Exhibition = {
     Title: string
@@ -58,7 +60,7 @@ const exhibitions: Exhibition[] = [
 
 const Exhibitions = () => {
     return (
-        <div className="p-[15px] md:p-[30px]">
+        <div className="p-[15px] md:p-[30px] w-full overflow-x-scroll">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Exhibitions</h1>
             <div className="flex justify-end mt-4">
                 <Button>Add Exhibition</Button>
@@ -67,6 +69,7 @@ const Exhibitions = () => {
                 <Searchbar color="default" size="sm" placeholder="Search By Title..." />
             </div>
             <div className="mt-4">
+
                 <Table>
                     <Table.Head>
                         <Table.HeadRow>
@@ -88,6 +91,9 @@ const Exhibitions = () => {
                             <Table.HeadCell>
                                 CAPACITY
                             </Table.HeadCell>
+                            <Table.HeadCell>
+                                ACTIONS
+                            </Table.HeadCell>
                         </Table.HeadRow>
 
                     </Table.Head>
@@ -99,7 +105,10 @@ const Exhibitions = () => {
                                         {exhibition.Title}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {exhibition.Location}
+                                        <div className="flex items-center">
+                                            <MapPin size={15} />
+                                            {exhibition.Location}
+                                        </div>
                                     </Table.Cell>
                                     <Table.Cell>
                                         {exhibition.Organizer}
@@ -108,10 +117,24 @@ const Exhibitions = () => {
                                         {exhibition.Dates}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {exhibition.Status}
+                                        <Table.Status
+                                            color={exhibition.Status === "Completed" ? "green"
+                                                : exhibition.Status === "Upcoming" ? "blue"
+                                                    : exhibition.Status === "Ongoing" ? "yellow"
+                                                        : "red"
+                                            }
+                                        >
+                                            {exhibition.Status}
+                                        </Table.Status>
                                     </Table.Cell>
                                     <Table.Cell>
                                         {exhibition.Capacity}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <ActionButtons>
+                                            <ActionButtons.Button Icon={SquarePen} type="icon" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                        </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>
                             )
@@ -119,9 +142,17 @@ const Exhibitions = () => {
 
                     </Table.Body>
                 </Table>
-
             </div>
+
+            <div className="flex justify-end mt-[20px]">
+                <ActionButtons>
+                    <ActionButtons.Button type="icon" Icon={ChevronLeft} />
+                    <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                </ActionButtons>
+            </div>
+
         </div>
+
     )
 }
 

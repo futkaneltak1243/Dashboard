@@ -19,7 +19,7 @@ const Dashboard: FC<DashboardProps> & {
 }) => {
         return (
             <div
-                className={cn("w-screen min-h-screen bg-layout-light dark:bg-layout-dark flex", className)}
+                className={cn("w-screen min-h-screen bg-layout-light dark:bg-layout-dark flex ", className)}
             >
                 {children}
             </div>
@@ -30,7 +30,7 @@ const Content: FC<ContentProps> = ({ children }) => {
     const { isSidebarOpen } = useSidebar()
     return (
         <div
-            className={cn("h-full flex-1 relative transition-all duration-150", {
+            className={cn("h-full flex-1 relative transition-all duration-150 w-full", {
                 "sm:pl-[86px]": !isSidebarOpen,
                 "sm:pl-[240px]": isSidebarOpen
             })}

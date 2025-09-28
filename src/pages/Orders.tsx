@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { FilterBar } from "../components/Filter";
 import { Table } from "../components/Table";
+import { ActionButtons } from "../components/ActionButtons";
+import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 
 type Order = {
     id: number;
@@ -129,6 +131,9 @@ const Orders = () => {
                                 <Table.HeadCell>
                                     STATUS
                                 </Table.HeadCell>
+                                <Table.HeadCell>
+                                    ACTIONS
+                                </Table.HeadCell>
                             </Table.HeadRow>
                         </Table.Head>
                         <Table.Body>
@@ -151,13 +156,32 @@ const Orders = () => {
                                             {order.type}
                                         </Table.Cell>
                                         <Table.Cell>
-                                            {order.status}
+                                            <Table.Status
+                                                color={order.status === "Completed" ? "green"
+                                                    : order.status === "Rejected" ? "red"
+                                                        : order.status === "On Hold" ? "yellow"
+                                                            : "blue"
+                                                }
+                                            >
+                                                {order.status}
+                                            </Table.Status>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <ActionButtons>
+                                                <ActionButtons.Button type="icon" Icon={Eye} />
+                                            </ActionButtons>
                                         </Table.Cell>
                                     </Table.Row>
                                 )
                             })}
                         </Table.Body>
                     </Table>
+                </div>
+                <div className="flex justify-end mt-[20px]">
+                    <ActionButtons>
+                        <ActionButtons.Button type="icon" Icon={ChevronLeft} />
+                        <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                    </ActionButtons>
                 </div>
             </div>
 

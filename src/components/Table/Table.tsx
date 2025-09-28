@@ -85,7 +85,7 @@ const Cell: FC<CellProps> = ({ children, className }) => {
                 className
             )}
         >
-            <div className="line-clamp-3 ">
+            <div className="line-clamp-3 text-sm">
                 {children}
             </div>
         </td>
@@ -95,12 +95,12 @@ const Cell: FC<CellProps> = ({ children, className }) => {
 const Status: FC<StatusProps> = ({ children, color, className }) => {
     return (
         <div className={cn(
-            "max-w-[93px] h-[29px] p-2 rounded-[4.5px] flex items-center justify-center",
+            "max-w-[93px] h-[29px] p-2 rounded-[4.5px] flex items-center justify-center text-xs",
             className, {
-            "bg-green-300": color === "green",
-            "bg-blue-500": color === "blue",
-            "bg-yellow-200": color === "yellow",
-            "bg-red-500": color === "red",
+            "bg-[#00B69B]/20 dark:bg-[#00B69B] dark:text-white  text-[#00B69B]": color === "green",
+            "bg-[#6226EF]/20 dark:bg-[#6226EF] dark:text-white text-[#6226EF]": color === "blue",
+            "bg-[#FFA756]/20 dark:bg-[#FFA756] dark:text-white  text-[#FFA756]": color === "yellow",
+            "bg-[#EF3826]/20 dark:bg-[#EF3826] dark:text-white   text-[#EF3826]": color === "red",
         })}>
             {children}
         </div>
@@ -118,7 +118,7 @@ const Table: FC<TableProps> & {
     Status: FC<StatusProps>
 } = ({ children, className }) => {
     return (
-        <div className="rounded-lg border border-lightgray dark:border-darkgray  max-w-full overflow-x-auto ">
+        <div className="rounded-lg border border-lightgray dark:border-darkgray  w-full overflow-x-auto ">
             <table className={cn(
                 "bg-items-light dark:bg-items-dark w-full divide-y  divide-lightgray dark:divide-darkgray text-text-light dark:text-text-dark text-xs sm:text-base",
                 className

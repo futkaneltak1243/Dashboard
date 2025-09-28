@@ -3,6 +3,75 @@ import { Button } from "../components/Button"
 import { FilterBar } from "../components/Filter"
 import { Table } from "../components/Table"
 import { Searchbar } from "../components/Searchbar"
+import { ActionButtons } from "../components/ActionButtons"
+import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
+
+
+
+type UserStatus = "active" | "inactive" | "pending";
+
+type UserRole = "Admin" | "Customer" | "Seller";
+
+interface User {
+    id: number;
+    name: string;
+    username: string;
+    email: string;
+    role: UserRole;
+    status: UserStatus;
+}
+
+// JSON array of users
+const users: User[] = [
+    {
+        id: 1,
+        name: "Alice Johnson",
+        username: "alicej",
+        email: "alice@example.com",
+        role: "Admin",
+        status: "active"
+    },
+    {
+        id: 2,
+        name: "Bob Smith",
+        username: "bobsmith",
+        email: "bob@example.com",
+        role: "Customer",
+        status: "inactive"
+    },
+    {
+        id: 3,
+        name: "Charlie Brown",
+        username: "charlieb",
+        email: "charlie@example.com",
+        role: "Seller",
+        status: "active"
+    },
+    {
+        id: 4,
+        name: "Diana Prince",
+        username: "dianap",
+        email: "diana@example.com",
+        role: "Admin",
+        status: "active"
+    },
+    {
+        id: 5,
+        name: "Ethan Hunt",
+        username: "ethanh",
+        email: "ethan@example.com",
+        role: "Customer",
+        status: "pending"
+    },
+    {
+        id: 6,
+        name: "Fiona White",
+        username: "fionaw",
+        email: "fiona@example.com",
+        role: "Seller",
+        status: "inactive"
+    }
+];
 
 const Users = () => {
     const roleFilters = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
@@ -30,14 +99,7 @@ const Users = () => {
         })
     }, [])
 
-    const users = [
-        [1, "Alice Johnson", "alicej", "alice@example.com", "Admin", "active"],
-        [2, "Bob Smith", "bobsmith", "bob@example.com", "Customer", "inactive"],
-        [3, "Charlie Brown", "charlieb", "charlie@example.com", "Seller", "active"],
-        [4, "Diana Prince", "dianap", "diana@example.com", "Admin", "active"],
-        [5, "Ethan Hunt", "ethanh", "ethan@example.com", "Customer", "pending"],
-        [6, "Fiona White", "fionaw", "fiona@example.com", "Seller", "inactive"]
-    ]
+
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
@@ -80,33 +142,75 @@ const Users = () => {
                                 ID
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                Full Name
+                                FULL NAME
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                Username
+                                USERNAME
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                Email
+                                EMAIL
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                Role
+                                ROLE
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                Status
+                                STATUS
+                            </Table.HeadCell>
+                            <Table.HeadCell>
+                                ACTIONS
                             </Table.HeadCell>
                         </Table.HeadRow>
                     </Table.Head>
                     <Table.Body>
-                        {users.map((user: (number | string)[]) => {
-                            return (<Table.Row>{
-                                user.map((field: string | number) => {
-                                    return <Table.Cell>{field}</Table.Cell>
-                                })
-                            }</Table.Row>)
+                        {users.map((user: User) => {
+                            return (
+                                <Table.Row key={user.email}>
+                                    <Table.Cell>
+                                        {user.id}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {user.name}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {user.username}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {user.email}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Table.Status color={user.role === "Admin" ? "red"
+                                            : user.role === "Customer" ? "green"
+                                                : "yellow"
+                                        }>
+                                            {user.role}
+                                        </Table.Status>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Table.Status color={user.status === "active" ? "green"
+                                            : user.status === "inactive" ? "red"
+                                                : "blue"
+                                        }>
+                                            {user.status}
+                                        </Table.Status>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <ActionButtons>
+                                            <ActionButtons.Button Icon={SquarePen} type="icon" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                        </ActionButtons>
+                                    </Table.Cell>
+                                </Table.Row>
+                            )
                         })}
 
                     </Table.Body>
                 </Table>
+                <div className="flex justify-end mt-[20px]">
+                    <ActionButtons>
+                        <ActionButtons.Button type="icon" Icon={ChevronLeft} />
+                        <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                    </ActionButtons>
+                </div>
 
             </div>
 
