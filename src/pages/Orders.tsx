@@ -128,10 +128,10 @@ const Orders = () => {
                                 <Table.HeadCell>
                                     TYPE
                                 </Table.HeadCell>
-                                <Table.HeadCell>
+                                <Table.HeadCell centered>
                                     STATUS
                                 </Table.HeadCell>
-                                <Table.HeadCell>
+                                <Table.HeadCell centered>
                                     ACTIONS
                                 </Table.HeadCell>
                             </Table.HeadRow>
@@ -155,7 +155,7 @@ const Orders = () => {
                                         <Table.Cell>
                                             {order.type}
                                         </Table.Cell>
-                                        <Table.Cell>
+                                        <Table.Cell centered>
                                             <Table.Status
                                                 color={order.status === "Completed" ? "green"
                                                     : order.status === "Rejected" ? "red"
@@ -166,7 +166,7 @@ const Orders = () => {
                                                 {order.status}
                                             </Table.Status>
                                         </Table.Cell>
-                                        <Table.Cell>
+                                        <Table.Cell centered>
                                             <ActionButtons>
                                                 <ActionButtons.Button type="icon" Icon={Eye} />
                                             </ActionButtons>

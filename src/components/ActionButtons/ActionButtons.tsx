@@ -11,7 +11,7 @@ interface ButtonProps {
     children?: ReactNode;
     size?: "default" | "lg";
     onClick?: () => void;
-    iconColor?: string;
+    iconClass?: string;
 }
 
 
@@ -21,17 +21,17 @@ const ActionButtons: FC<ActionButtonsProps> & {
 } = ({ children }) => {
     return (
         <div
-            className="flex items-center border border-lightgray divide-x divide-lightgray rounded-lg overflow-hidden w-fit"
+            className="flex items-center border border-lightgray divide-x divide-lightgray rounded-lg overflow-hidden w-fit "
         >
             {children}
         </div>
     )
 }
 
-const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onClick, iconColor = "black" }) => {
+const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onClick, iconClass }) => {
     return (
         <button
-            className={cn("cursor-pointer bg-[#FAFBFD] dark:bg-[#323D4E] flex items-center justify-center",
+            className={cn("cursor-pointer bg-[#FAFBFD] dark:bg-[#323D4E] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#404B5C] transition",
                 {
 
                     "w-[40px] h-[40px]": size === "lg" && type === "icon",
@@ -45,9 +45,8 @@ const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onCli
             {
                 type === "icon" && Icon ?
                     <Icon
-                        className="text-black dark:text-white"
+                        className={cn("text-black dark:text-white", iconClass)}
                         size={18}
-                        color={iconColor}
                     />
                     : children
             }

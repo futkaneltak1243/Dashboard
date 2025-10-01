@@ -14,6 +14,7 @@ interface HeadRowProps {
 interface HeadCellProps {
     children: ReactNode;
     className?: string;
+    centered?: boolean
 }
 
 interface RowProps {
@@ -24,6 +25,7 @@ interface RowProps {
 interface CellProps {
     children: ReactNode;
     className?: string;
+    centered?: boolean
 }
 
 interface StatusProps {
@@ -57,10 +59,15 @@ const HeadRow: FC<HeadRowProps> = ({ children, className }) => {
     )
 }
 
-const HeadCell: FC<HeadCellProps> = ({ children, className }) => {
+const HeadCell: FC<HeadCellProps> = ({ children, className, centered = false }) => {
     return (
         <th
-            className={cn("pl-5 pr-3 text-left font-semibold", className,)}
+            className={cn(" pr-3 text-left font-semibold", className,
+                {
+                    "pl-5": !centered,
+                    "text-center": centered
+                }
+            )}
         >
             {children}
         </th>
@@ -78,12 +85,16 @@ const Row: FC<RowProps> = ({ children, className }) => {
 }
 
 
-const Cell: FC<CellProps> = ({ children, className }) => {
+const Cell: FC<CellProps> = ({ children, className, centered }) => {
     return (
         <td
-            className={cn("pl-5 pr-3 max-w-[180px] max-h-[90px] whitespace-normal break-words truncate ",
-                className
+            className={cn(" pr-3 max-w-[180px] max-h-[90px] whitespace-normal break-words truncate ",
+                className,
+                {
+                    "pl-5": !centered
+                }
             )}
+            align={centered ? "center" : "left"}
         >
             <div className="line-clamp-3 text-sm">
                 {children}

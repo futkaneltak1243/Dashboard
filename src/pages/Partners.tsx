@@ -181,13 +181,13 @@ const Partners = () => {
                             <Table.HeadCell>
                                 EMAIL
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
                                 TYPE
                             </Table.HeadCell>
                             <Table.HeadCell>
                                 JOIND
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
                                 Actions
                             </Table.HeadCell>
 
@@ -206,7 +206,7 @@ const Partners = () => {
                                     <Table.Cell>
                                         {partner.email}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell centered>
                                         <Table.Status color={partner.type === "Partner" ? "red"
                                             : partner.type === "Investor" ? "blue"
                                                 : partner.type === "Supplier" ? "green"
@@ -218,10 +218,10 @@ const Partners = () => {
                                     <Table.Cell>
                                         {partner.joined}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell centered>
                                         <ActionButtons>
                                             <ActionButtons.Button Icon={SquarePen} type="icon" />
-                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
                                         </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>

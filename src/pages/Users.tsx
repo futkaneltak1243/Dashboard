@@ -150,13 +150,13 @@ const Users = () => {
                             <Table.HeadCell>
                                 EMAIL
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
                                 ROLE
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
                                 STATUS
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
                                 ACTIONS
                             </Table.HeadCell>
                         </Table.HeadRow>
@@ -177,7 +177,7 @@ const Users = () => {
                                     <Table.Cell>
                                         {user.email}
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell centered>
                                         <Table.Status color={user.role === "Admin" ? "red"
                                             : user.role === "Customer" ? "green"
                                                 : "yellow"
@@ -185,7 +185,7 @@ const Users = () => {
                                             {user.role}
                                         </Table.Status>
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell centered>
                                         <Table.Status color={user.status === "active" ? "green"
                                             : user.status === "inactive" ? "red"
                                                 : "blue"
@@ -193,10 +193,10 @@ const Users = () => {
                                             {user.status}
                                         </Table.Status>
                                     </Table.Cell>
-                                    <Table.Cell>
+                                    <Table.Cell centered>
                                         <ActionButtons>
                                             <ActionButtons.Button Icon={SquarePen} type="icon" />
-                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
                                         </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>

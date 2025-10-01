@@ -86,12 +86,13 @@ const Exhibitions = () => {
                                 DATES
                             </Table.HeadCell>
                             <Table.HeadCell>
-                                STATUS
-                            </Table.HeadCell>
-                            <Table.HeadCell>
                                 CAPACITY
                             </Table.HeadCell>
-                            <Table.HeadCell>
+                            <Table.HeadCell centered>
+                                STATUS
+                            </Table.HeadCell>
+
+                            <Table.HeadCell centered>
                                 ACTIONS
                             </Table.HeadCell>
                         </Table.HeadRow>
@@ -117,6 +118,9 @@ const Exhibitions = () => {
                                         {exhibition.Dates}
                                     </Table.Cell>
                                     <Table.Cell>
+                                        {exhibition.Capacity}
+                                    </Table.Cell>
+                                    <Table.Cell centered>
                                         <Table.Status
                                             color={exhibition.Status === "Completed" ? "green"
                                                 : exhibition.Status === "Upcoming" ? "blue"
@@ -127,13 +131,11 @@ const Exhibitions = () => {
                                             {exhibition.Status}
                                         </Table.Status>
                                     </Table.Cell>
-                                    <Table.Cell>
-                                        {exhibition.Capacity}
-                                    </Table.Cell>
-                                    <Table.Cell>
+
+                                    <Table.Cell centered>
                                         <ActionButtons>
                                             <ActionButtons.Button Icon={SquarePen} type="icon" />
-                                            <ActionButtons.Button Icon={Trash2} type="icon" iconColor="red" />
+                                            <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
                                         </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>
