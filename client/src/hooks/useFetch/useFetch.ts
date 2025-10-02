@@ -26,7 +26,7 @@ export default function useFetch<T>(url: string, options?: RequestInit) {
 
         async function fetchData() {
             try {
-                const res = await fetch(`${serverDomain}/${url}`, options);
+                const res = await fetch(`${serverDomain}${url}`, options);
                 if (!res.ok) throw new Error(`Error: ${res.status}`);
                 const data = (await res.json()) as T;
 

@@ -7,12 +7,13 @@ import { ActionButtons } from "../components/ActionButtons"
 import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
 import { cn } from "../components/classNames"
 import useFetch from "../hooks/useFetch/useFetch"
+import type { UserRole, UserStatus } from "../types/user"
+import { useUserFilters } from "../hooks/filtersHooks/useUserFilters"
+import { useLocation } from "react-router-dom"
 
 
 
-type UserStatus = "active" | "inactive" | "pending";
 
-type UserRole = 'Super Admin' | 'Admin' | 'Manager' | 'Seller' | 'Delivery Agent' | 'Customer';
 
 interface User {
     id: number;
@@ -29,10 +30,13 @@ interface User {
 
 const Users = () => {
 
+    const { setFilters, status, role } = useUserFilters()
+
     const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
     const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
-    const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>([])
-    const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>([])
+    const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
+    const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
+    const location = useLocation()
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
         setSelectedRoleFilteres((prev: UserRole[]) => {
@@ -55,7 +59,7 @@ const Users = () => {
     }, [])
 
 
-    const { data, loading, error } = useFetch<User[]>("users")
+    const { data, loading, error } = useFetch<User[]>(location.pathname + location.search)
 
 
 
@@ -63,7 +67,6 @@ const Users = () => {
     if (error) return <p>Error: {error}</p>;
 
     if (!data) return
-    const users = data
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
@@ -74,7 +77,7 @@ const Users = () => {
                 <FilterBar breakPoint='md'>
                     <FilterBar.Filter >
                         <FilterBar.Button label="Role" />
-                        <FilterBar.Popover title="Select a role" description="*you can choose multible roles" buttonClick={() => null} buttonLabel="Apply Now">
+                        <FilterBar.Popover title="Select a role" description="*you can choose multible roles" buttonClick={() => setFilters({ role: selectedRoleFiltres })} buttonLabel="Apply Now">
                             {roleFilters.map((filter: UserRole, index: number) => {
                                 return <FilterBar.Option key={index} selected={selectedRoleFiltres.includes(filter)} label={filter} onClick={() => handleRoleFilterSelect(filter)} />
 
@@ -126,9 +129,9 @@ const Users = () => {
                         </Table.HeadRow>
                     </Table.Head>
                     <Table.Body>
-                        {users.map((user: User) => {
+                        {data.map((user: User) => {
                             return (
-                                <Table.Row key={user.email}>
+                                <Table.Row key={user.id}>
                                     <Table.Cell>
                                         {user.id}
                                     </Table.Cell>
