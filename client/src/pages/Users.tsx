@@ -5,94 +5,49 @@ import { Table } from "../components/Table"
 import { Searchbar } from "../components/Searchbar"
 import { ActionButtons } from "../components/ActionButtons"
 import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
+import { cn } from "../components/classNames"
+import useFetch from "../hooks/useFetch/useFetch"
 
 
 
 type UserStatus = "active" | "inactive" | "pending";
 
-type UserRole = "Admin" | "Customer" | "Seller";
+type UserRole = 'Super Admin' | 'Admin' | 'Manager' | 'Seller' | 'Delivery Agent' | 'Customer';
 
 interface User {
     id: number;
-    name: string;
+    full_name: string;
     username: string;
     email: string;
     role: UserRole;
     status: UserStatus;
+    avatar: string | "null"
+
 }
 
-// JSON array of users
-const users: User[] = [
-    {
-        id: 1,
-        name: "Alice Johnson",
-        username: "alicej",
-        email: "alice@example.com",
-        role: "Admin",
-        status: "active"
-    },
-    {
-        id: 2,
-        name: "Bob Smith",
-        username: "bobsmith",
-        email: "bob@example.com",
-        role: "Customer",
-        status: "inactive"
-    },
-    {
-        id: 3,
-        name: "Charlie Brown",
-        username: "charlieb",
-        email: "charlie@example.com",
-        role: "Seller",
-        status: "active"
-    },
-    {
-        id: 4,
-        name: "Diana Prince",
-        username: "dianap",
-        email: "diana@example.com",
-        role: "Admin",
-        status: "active"
-    },
-    {
-        id: 5,
-        name: "Ethan Hunt",
-        username: "ethanh",
-        email: "ethan@example.com",
-        role: "Customer",
-        status: "pending"
-    },
-    {
-        id: 6,
-        name: "Fiona White",
-        username: "fionaw",
-        email: "fiona@example.com",
-        role: "Seller",
-        status: "inactive"
-    }
-];
+
 
 const Users = () => {
-    const roleFilters = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
-    const statusFilters = ['active', 'inactive', 'pending']
-    const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<string[]>([])
-    const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([])
 
-    const handleRoleFilterSelect = useCallback((filter: string) => {
-        setSelectedRoleFilteres((prev: string[]) => {
+    const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
+    const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
+    const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>([])
+    const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>([])
+
+    const handleRoleFilterSelect = useCallback((filter: UserRole) => {
+        setSelectedRoleFilteres((prev: UserRole[]) => {
             if (prev.includes(filter)) {
-                return prev.filter((f: string) => f !== filter)
+                return prev.filter((f: UserRole) => f !== filter)
             }
             return [...prev, filter]
 
         })
     }, [])
 
-    const handleStatusFilterSelect = useCallback((filter: string) => {
-        setSelectedStatusFilters((prev: string[]) => {
+    const handleStatusFilterSelect = useCallback((filter: UserStatus) => {
+        setSelectedStatusFilters((prev: UserStatus[]) => {
             if (prev.includes(filter)) {
-                return prev.filter((f: string) => f !== filter)
+                return prev.filter((f: UserStatus) => f !== filter)
             }
             return [...prev, filter]
 
@@ -100,6 +55,15 @@ const Users = () => {
     }, [])
 
 
+    const { data, loading, error } = useFetch<User[]>("users")
+
+
+
+    if (loading) return <p>Loading users...</p>;
+    if (error) return <p>Error: {error}</p>;
+
+    if (!data) return
+    const users = data
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
@@ -111,7 +75,7 @@ const Users = () => {
                     <FilterBar.Filter >
                         <FilterBar.Button label="Role" />
                         <FilterBar.Popover title="Select a role" description="*you can choose multible roles" buttonClick={() => null} buttonLabel="Apply Now">
-                            {roleFilters.map((filter: string, index: number) => {
+                            {roleFilters.map((filter: UserRole, index: number) => {
                                 return <FilterBar.Option key={index} selected={selectedRoleFiltres.includes(filter)} label={filter} onClick={() => handleRoleFilterSelect(filter)} />
 
                             })}
@@ -122,7 +86,7 @@ const Users = () => {
                     <FilterBar.Filter >
                         <FilterBar.Button label="Status" />
                         <FilterBar.Popover title="Select Status" description="*you can choose multible status" buttonClick={() => null} buttonLabel="Apply Now">
-                            {statusFilters.map((filter: string, index: number) => {
+                            {statusFilters.map((filter: UserStatus, index: number) => {
                                 return <FilterBar.Option key={index} selected={selectedStatusFilters.includes(filter)} label={filter} onClick={() => handleStatusFilterSelect(filter)} />
 
                             })}
@@ -169,7 +133,7 @@ const Users = () => {
                                         {user.id}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {user.name}
+                                        {user.full_name}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {user.username}
@@ -178,10 +142,14 @@ const Users = () => {
                                         {user.email}
                                     </Table.Cell>
                                     <Table.Cell centered>
-                                        <Table.Status color={user.role === "Admin" ? "red"
-                                            : user.role === "Customer" ? "green"
-                                                : "yellow"
-                                        }>
+                                        <Table.Status
+                                            color={user.role === "Admin" || user.role === "Super Admin" ? "red"
+                                                : user.role === "Customer" ? "green"
+                                                    : user.role === "Manager" ? "blue"
+                                                        : "yellow"
+                                            }
+                                            className={cn({ "text-[10px]": user.role === "Delivery Agent" })}
+                                        >
                                             {user.role}
                                         </Table.Status>
                                     </Table.Cell>
