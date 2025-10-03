@@ -1,5 +1,6 @@
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
+const chalk = require("chalk");
 
 // Database file name
 const DB_FILE = "database.db";
@@ -7,15 +8,15 @@ const DB_FILE = "database.db";
 // Delete old database file if it exists
 if (fs.existsSync(DB_FILE)) {
   fs.unlinkSync(DB_FILE);
-  console.log("Old database deleted.");
+  console.info(chalk.green("Old database deleted."));
 }
 
 // Create new database
 const db = new sqlite3.Database(DB_FILE, (err) => {
   if (err) {
-    console.error("Error creating database:", err.message);
+    console.error(chalk.red("Error creating database:"), err.message);
   } else {
-    console.log("New database created successfully.");
+    console.info(chalk.green("New database created successfully."));
   }
 });
 
@@ -94,7 +95,7 @@ db.serialize(() => {
     );
   `);
 
-  console.log("All tables created successfully!");
+  console.info(chalk.green("All tables created successfully!"));
 });
 
 // Close the database connection
