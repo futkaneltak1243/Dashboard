@@ -14,7 +14,7 @@ interface ProductProps {
     images: string[]
     title: string;
     price: number;
-    isFavorites: boolean;
+    isFavorites: 1 | 0;
 }
 
 interface ProductsProps {
@@ -91,7 +91,7 @@ const Product: FC<ProductProps> = ({ images, title, price, isFavorites }) => {
                     <button className="w-[20px] h-[20px] sm:w-[30px] sm:h-[30px] lg:w-[44px] lg:h-[44px] bg-[#F9F9F9] flex items-center justify-center rounded-full cursor-pointer dark:bg-items-dark2">
                         <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4 md:w-5 lg:w-6 md:h-5 lg:h-6  text-red-500",
                             {
-                                "fill-current": isFavorites
+                                "fill-current": isFavorites === 1
                             }
                         )} />
 

@@ -1,5 +1,5 @@
 import { Input } from "../Input"
-import type { FC } from "react"
+import type { ChangeEventHandler, FC } from "react"
 import { Search } from "lucide-react"
 import { cn } from "../classNames"
 
@@ -8,6 +8,8 @@ interface SearchbarProps {
     color?: "default" | "soft";
     size?: "full" | "lg" | "md" | "sm";
     placeholder?: string;
+    buttonClick?: () => void;
+    onChange?: ChangeEventHandler<HTMLInputElement>
 }
 
 
@@ -15,6 +17,8 @@ const SearchInput: FC<SearchbarProps> = ({
     color = "soft",
     size = "lg",
     placeholder = "Search...",
+    buttonClick,
+    onChange,
 }) => {
     return (
         <div className={cn("inline-flex w-full", {
@@ -32,6 +36,7 @@ const SearchInput: FC<SearchbarProps> = ({
                         "w-[40px] h-[38px]": size === "sm",
                     }
                 )}
+                onClick={buttonClick}
             >
                 <Search
                     className={cn("text-midgray", {
@@ -40,7 +45,7 @@ const SearchInput: FC<SearchbarProps> = ({
                     })}
                 />
             </button>
-            <Input variant={"search"} color={color} size={size} placeholder={placeholder} />
+            <Input variant={"search"} color={color} size={size} placeholder={placeholder} onChange={onChange} />
         </div>
     )
 }

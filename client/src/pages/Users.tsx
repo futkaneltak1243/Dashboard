@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useState, type ChangeEvent } from "react"
 import { Button } from "../components/Button"
 import { FilterBar } from "../components/Filter"
 import { Table } from "../components/Table"
@@ -17,25 +17,30 @@ import { useLocation } from "react-router-dom"
 
 interface User {
     id: number;
-    full_name: string;
+    fullname: string;
     username: string;
     email: string;
     role: UserRole;
     status: UserStatus;
-    avatar: string | "null"
+    avatar: string | "null";
 
 }
 
-
+interface Data {
+    page: number;
+    limit: number;
+    count: number;
+    data: User[];
+}
+const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
+const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
 
 const Users = () => {
 
     const { setFilters, status, role } = useUserFilters()
-
-    const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
-    const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
     const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
+    const [name, setName] = useState<string>("")
     const location = useLocation()
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
@@ -58,15 +63,18 @@ const Users = () => {
         })
     }, [])
 
+    const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value)
+    }, [])
 
-    const { data, loading, error } = useFetch<User[]>(location.pathname + location.search)
-
+    const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
 
 
     if (loading) return <p>Loading users...</p>;
     if (error) return <p>Error: {error}</p>;
 
-    if (!data) return
+    const users = data?.data
+    if (!users) return
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
@@ -88,7 +96,7 @@ const Users = () => {
 
                     <FilterBar.Filter >
                         <FilterBar.Button label="Status" />
-                        <FilterBar.Popover title="Select Status" description="*you can choose multible status" buttonClick={() => null} buttonLabel="Apply Now">
+                        <FilterBar.Popover title="Select Status" description="*you can choose multible status" buttonClick={() => setFilters({ status: selectedStatusFilters })} buttonLabel="Apply Now">
                             {statusFilters.map((filter: UserStatus, index: number) => {
                                 return <FilterBar.Option key={index} selected={selectedStatusFilters.includes(filter)} label={filter} onClick={() => handleStatusFilterSelect(filter)} />
 
@@ -99,7 +107,13 @@ const Users = () => {
                 </FilterBar>
             </div>
             <div className="mt-4 flex justify-end">
-                <Searchbar color="default" size="sm" placeholder="Search Product..." />
+                <Searchbar
+                    color="default"
+                    size="sm"
+                    placeholder="Search Users..."
+                    buttonClick={() => setFilters({ name: name })}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
+                />
             </div>
             <div className="mt-4">
                 <Table>
@@ -129,14 +143,14 @@ const Users = () => {
                         </Table.HeadRow>
                     </Table.Head>
                     <Table.Body>
-                        {data.map((user: User) => {
+                        {users.map((user: User) => {
                             return (
                                 <Table.Row key={user.id}>
                                     <Table.Cell>
                                         {user.id}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {user.full_name}
+                                        {user.fullname}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {user.username}
