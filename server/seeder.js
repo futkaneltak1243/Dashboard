@@ -127,6 +127,8 @@ db.serialize(() => {
     });
 
     // ORDERS
+    const orderStatuses = ["Completed", "Processing", "Rejected", "On Hold", "In Transit"];
+
     const insertOrder = db.prepare(`
     INSERT INTO orders (user_id, address, date, status) VALUES (?, ?, ?, ?)
   `);
@@ -142,7 +144,7 @@ db.serialize(() => {
             faker.number.int({ min: 1, max: 100 }),
             faker.location.streetAddress(),
             faker.date.recent().toISOString().split("T")[0],
-            faker.helpers.arrayElement(statuses)
+            faker.helpers.arrayElement(orderStatuses)
         );
     }
 

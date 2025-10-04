@@ -171,6 +171,76 @@ app.get("/api/exhibitions", (req, res) => {
     });
 });
 
+app.get("/api/orders", (req, res) => {
+    const { date, status, page = 1, limit = 10 } = req.query;
+
+    const filters = [];
+    const params = [];
+
+    // Date filter
+    if (date) {
+        filters.push(`o.date = ?`);
+        params.push(date);
+    }
+
+    // Status filter (multiple statuses)
+    if (status) {
+        const statuses = Array.isArray(status) ? status : [status];
+        filters.push(`o.status IN (${statuses.map(() => "?").join(",")})`);
+        params.push(...statuses);
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+
+    // Pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const sql = `
+        SELECT 
+            o.id,
+            o.address,
+            o.date,
+            o.status,
+            u.fullname AS user_fullname,
+            COALESCE(
+                json_group_array(
+                    json_object(
+                        'name', p.name,
+                        'price', p.price
+                    )
+                ), '[]'
+            ) AS products
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        LEFT JOIN orders_products op ON o.id = op.order_id
+        LEFT JOIN products p ON op.product_id = p.id
+        ${whereClause}
+        GROUP BY o.id
+        LIMIT ? OFFSET ?
+    `;
+    params.push(parseInt(limit), offset);
+
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        // Parse JSON strings into actual objects
+        const formattedRows = rows.map(row => ({
+            ...row,
+            products: JSON.parse(row.products)
+        }));
+
+        res.status(200).json({
+            page: parseInt(page),
+            limit: parseInt(limit),
+            count: formattedRows.length,
+            data: formattedRows,
+        });
+    });
+});
+
+
 app.listen(3000, () => {
     console.log("Server started on PORT :3000");
     console.log("Index:\nhttp://localhost:3000/")
