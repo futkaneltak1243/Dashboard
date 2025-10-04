@@ -52,14 +52,16 @@ interface ActionBoxProps {
 interface FilterBarProps {
     children?: ReactNode;
     breakPoint: BreakPoint;
+    resetButtonClick?: () => void;
 }
 
 interface FilterIconBoxProps {
     className?: string;
 }
 
-interface FilterRestartActionBoxProps {
+interface FilterResetActionBoxProps {
     className?: string;
+    onClick?: () => void
 }
 
 interface DateFilterProps {
@@ -99,7 +101,7 @@ const FilterBar: FC<FilterBarProps> & {
     DateFilter: FC<DateFilterProps>,
     DateButton: FC<DateButtonProps>,
     DatePopover: FC<DatePopoverProps>
-} = ({ children, breakPoint }) => {
+} = ({ children, breakPoint, resetButtonClick }) => {
 
     const contextValue: BreakPoint = breakPoint
 
@@ -136,24 +138,25 @@ const FilterBar: FC<FilterBarProps> & {
                     </TriggerWithPopover.Popover>
                 </TriggerWithPopover>
 
-                <FilterRestartActionBox />
+                <FilterResetActionBox onClick={resetButtonClick} />
             </div>
         </BreakPointContext.Provider>
     )
 }
 
-const FilterRestartActionBox: FC<FilterRestartActionBoxProps> = ({ className }) => {
+const FilterResetActionBox: FC<FilterResetActionBoxProps> = ({ className, onClick }) => {
     return (
-        <div
+        <button
             className={cn(
                 "flex items-center justify-center bg-[#F9F9FB] dark:bg-items-dark text-text-light dark:text-text-dark  cursor-pointer relative  h-[70px] text-sm  p-[26px] w-auto",
                 className)}
+            onClick={onClick}
         >
             <div className='items-center flex justify-center'>
                 <RotateCcw size={15} className='mr-3'></RotateCcw>
-                Restart Filter
+                Reset Filter
             </div>
-        </div>
+        </button>
     )
 }
 

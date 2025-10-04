@@ -10,7 +10,8 @@ export default function useUserFilters() {
     const status = searchParams.getAll("status") as UserFilters["status"]
     const role = searchParams.getAll("role") as UserFilters["role"]
     const name = searchParams.get("name") as UserFilters["name"]
-
+    const pageStr = searchParams.get("page");
+    const page: UserFilters["page"] | null = pageStr ? Number(pageStr) || 1 : 1;
 
     const setFilters = useCallback((newFilters: UserFilters) => {
         setSearchParams(() => {
@@ -33,6 +34,12 @@ export default function useUserFilters() {
                     params.set("name", newFilters.name);
                 }
             }
+            if (newFilters.page === undefined) {
+                params.set("page", "1")
+
+            } else {
+                params.set("page", String(newFilters.page))
+            }
 
             return params;
         });
@@ -46,6 +53,7 @@ export default function useUserFilters() {
         status,
         role,
         name,
+        page,
         setFilters,
         clearFilters
     }
