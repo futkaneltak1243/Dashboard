@@ -3,41 +3,84 @@ import { Button } from "../components/Button"
 import { Products as Ps } from "../components/Products"
 import { Searchbar } from "../components/Searchbar";
 import useFetch from "../hooks/useFetch/useFetch";
+import type { Product } from "../types/product";
+import { useProductFilters } from "../hooks/filtersHooks/useProductFilters";
+import { useCallback, useState, type ChangeEvent } from "react";
+import { ActionButtons } from "../components/ActionButtons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
 
 
-type Product = {
-    images: string;
-    name: string;
-    price: number;
-    isfavorites: 1 | 0;
-};
 
 interface Data {
     page: number;
     limit: number;
+    total: number;
+    totalPages: number;
     count: number;
     data: Product[];
 }
 
 const Products = () => {
 
+
     const location = useLocation()
+    const { name: initialName, page, setFilters } = useProductFilters()
+    const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
+    const [name, setName] = useState<string>(initialName ? initialName : "")
 
-    const { data } = useFetch<Data>(location.pathname + location.search)
 
-    const products = data?.data
+    const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value)
+    }, [])
 
-    console.log(data)
+
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen">
+                <p className="text-red-600 text-2xl mb-2">Oops! Something went wrong.</p>
+                <p className="text-gray-600">{error}</p>
+            </div>
+        );
+    }
+
+    if (!data) return null;
+
+    const products = data.data
+
+    const handlePageChange = (p: number) => {
+        if (p < 1) return
+        if (p > data?.totalPages) return
+        setFilters({ page: p })
+    }
+
     return (
+
         <div className="p-[15px] md:p-[30px]">
+
             <h1 className="text-text-light dark:text-text-dark text-3xl">Products</h1>
             <div className="flex justify-end mt-4">
                 <Button>Add Product</Button>
             </div>
             <div className="mt-7">
-                <Searchbar color="default" size="sm" placeholder="Search Product..." />
+                <Searchbar
+                    color="default"
+                    size="sm"
+                    placeholder="Search Product..."
+                    buttonClick={() => setFilters({ name: name })}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
+                    value={name}
+                />
             </div>
             <div className="mt-4">
                 <Ps>
@@ -50,6 +93,26 @@ const Products = () => {
                     })}
                 </Ps>
 
+            </div>
+            <div className="flex justify-between mt-[20px]">
+                <p className="text-sm text-midgray">
+                    showing {1 + data.limit * (data.page - 1)}-{Math.min(data.limit * data.page, data.total)} of {data.total}
+                </p>
+                <ActionButtons>
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronLeft}
+                        onClick={() => handlePageChange(page ? page - 1 : 1)}
+                        disabled={page === 1}
+                    />
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronRight}
+                        onClick={() =>
+                            handlePageChange(page ? page + 1 : 1)}
+                        disabled={page === data.totalPages}
+                    />
+                </ActionButtons>
             </div>
 
         </div>
