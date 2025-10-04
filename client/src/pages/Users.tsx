@@ -30,9 +30,7 @@ interface Data {
     page: number;
     limit: number;
     count: number;
-    data: User[]
-
-
+    data: User[];
 }
 const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
 const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']

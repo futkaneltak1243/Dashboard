@@ -52,6 +52,45 @@ app.get("/api/users", (req, res) => {
     });
 });
 
+app.get("/api/products", (req, res) => {
+    const { name, isfavorite, page = 1, limit = 10 } = req.query;
+
+    // Filters
+    const filters = [];
+    const params = [];
+
+    if (name) {
+        filters.push(`name LIKE ?`);
+        params.push(`%${name}%`);
+    }
+
+    if (isfavorite !== undefined) {
+        filters.push(`isfavorite = ?`);
+        params.push(parseInt(isfavorite)); // 0 or 1
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+
+    // Pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const sql = `SELECT * FROM products ${whereClause} LIMIT ? OFFSET ?`;
+    params.push(parseInt(limit), offset);
+
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        res.status(200).json({
+            page: parseInt(page),
+            limit: parseInt(limit),
+            count: rows.length,
+            data: rows,
+        });
+    });
+});
+
+
 app.listen(3000, () => {
     console.log("Server started on PORT :3000");
     console.log("Index:\nhttp://localhost:3000/")
