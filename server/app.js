@@ -1,12 +1,13 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
+const cors = require("cors");
 
 const app = express();
 const db = new sqlite3.Database("database.db");
 
 
 
-
+app.use(cors());
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
 
@@ -15,13 +16,13 @@ app.get("/api/users", (req, res) => {
     const params = [];
 
     if (status) {
-        const statuses = status.split(","); // allow multiple statuses
+        const statuses = Array.isArray(status) ? status : [status]
         filters.push(`status IN (${statuses.map(() => "?").join(",")})`);
         params.push(...statuses);
     }
 
     if (role) {
-        const roles = role.split(","); // allow multiple roles
+        const roles = Array.isArray(role) ? role : [role]
         filters.push(`role IN (${roles.map(() => "?").join(",")})`);
         params.push(...roles);
     }
@@ -42,7 +43,7 @@ app.get("/api/users", (req, res) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.json({
+        res.status(200).json({
             page: parseInt(page),
             limit: parseInt(limit),
             count: rows.length,
