@@ -147,13 +147,13 @@ app.get("/api/partners", (req, res) => {
 
 /** 🔹 EXHIBITIONS API */
 app.get("/api/exhibitions", (req, res) => {
-    const { name, status, page = 1, limit = 10 } = req.query;
+    const { title, status, page = 1, limit = 10 } = req.query;
     const filters = [];
     const params = [];
 
-    if (name) {
-        filters.push(`name LIKE ?`);
-        params.push(`%${name}%`);
+    if (title) {
+        filters.push(`title LIKE ?`);
+        params.push(`%${title}%`);
     }
 
     if (status) {

@@ -3,62 +3,61 @@ import { Button } from "../components/Button"
 import { Searchbar } from "../components/Searchbar"
 import { Table } from "../components/Table"
 import { ChevronLeft, ChevronRight, MapPin, SquarePen, Trash2 } from "lucide-react"
+import type { Exhibition, ExhibitionFilters } from "../types/exhibitions"
+import { useCallback, useState, type ChangeEvent } from "react"
+import useFilters from "../hooks/useFilters/useFilters"
+import useFetch from "../hooks/useFetch/useFetch"
+import { useLocation } from "react-router-dom"
 
-type Exhibition = {
-    Title: string
-    Location: string
-    Organizer: string
-    Dates: string
-    Status: "Upcoming" | "Ongoing" | "Completed" | "Planned"
-    Capacity: number
+
+
+interface Data {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    count: number;
+    data: Exhibition[];
 }
 
-const exhibitions: Exhibition[] = [
-    {
-        Title: "Tech Expo 2025",
-        Location: "Berlin, Germany",
-        Organizer: "Global Tech Events",
-        Dates: "2025-03-15 to 2025-03-18",
-        Status: "Upcoming",
-        Capacity: 5000,
-    },
-    {
-        Title: "Art & Culture Fair",
-        Location: "Paris, France",
-        Organizer: "ArtWorld Association",
-        Dates: "2025-05-01 to 2025-05-07",
-        Status: "Upcoming",
-        Capacity: 1200,
-    },
-    {
-        Title: "Green Energy Summit",
-        Location: "Amsterdam, Netherlands",
-        Organizer: "EcoFuture Org",
-        Dates: "2025-07-20 to 2025-07-22",
-        Status: "Planned",
-        Capacity: 3000,
-    },
-    {
-        Title: "Medical Innovations Expo",
-        Location: "New York, USA",
-        Organizer: "HealthTech Group",
-        Dates: "2024-12-10 to 2024-12-12",
-        Status: "Completed",
-        Capacity: 4500,
-    },
-    {
-        Title: "Gaming World Conference",
-        Location: "Tokyo, Japan",
-        Organizer: "NextGen Gaming",
-        Dates: "2025-09-05 to 2025-09-09",
-        Status: "Ongoing",
-        Capacity: 8000,
-    },
-]
-
-
-
 const Exhibitions = () => {
+    const location = useLocation()
+    const { data, error, loading } = useFetch<Data>(location.pathname + location.search)
+    const { get, setFilters } = useFilters<ExhibitionFilters>()
+    const initialTitle = get("title", "string")
+    const page = get("page", "number")
+    const [title, setTitle] = useState<string>(initialTitle ? initialTitle : "")
+
+    const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value)
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen">
+                <p className="text-red-600 text-2xl mb-2">Oops! Something went wrong.</p>
+                <p className="text-gray-600">{error}</p>
+            </div>
+        );
+    }
+
+    if (!data) return null;
+
+    const handlePageChange = (p: number) => {
+        if (p < 1) return
+        if (p > data?.totalPages) return
+        setFilters({ page: p })
+    }
+
+    const exhibitions = data.data
     return (
         <div className="p-[15px] md:p-[30px] w-full overflow-x-scroll">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Exhibitions</h1>
@@ -66,7 +65,14 @@ const Exhibitions = () => {
                 <Button>Add Exhibition</Button>
             </div>
             <div className="mt-4 flex justify-start">
-                <Searchbar color="default" size="sm" placeholder="Search By Title..." />
+                <Searchbar
+                    color="default"
+                    size="sm"
+                    placeholder="Search Exhibitions..."
+                    onChange={handleSearchInputChange}
+                    buttonClick={() => setFilters({ title: title })}
+                    value={title}
+                />
             </div>
             <div className="mt-4">
 
@@ -101,34 +107,34 @@ const Exhibitions = () => {
                     <Table.Body>
                         {exhibitions.map((exhibition: Exhibition) => {
                             return (
-                                <Table.Row key={exhibition.Title}>
+                                <Table.Row key={exhibition.id}>
                                     <Table.Cell>
-                                        {exhibition.Title}
+                                        {exhibition.title}
                                     </Table.Cell>
                                     <Table.Cell>
                                         <div className="flex items-center">
                                             <MapPin size={15} />
-                                            {exhibition.Location}
+                                            {exhibition.location}
                                         </div>
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {exhibition.Organizer}
+                                        {exhibition.organizer}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {exhibition.Dates}
+                                        {exhibition.dates}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {exhibition.Capacity}
+                                        {exhibition.capacity}
                                     </Table.Cell>
                                     <Table.Cell centered>
                                         <Table.Status
-                                            color={exhibition.Status === "Completed" ? "green"
-                                                : exhibition.Status === "Upcoming" ? "blue"
-                                                    : exhibition.Status === "Ongoing" ? "yellow"
+                                            color={exhibition.status === "Completed" ? "green"
+                                                : exhibition.status === "Upcoming" ? "blue"
+                                                    : exhibition.status === "Ongoing" ? "yellow"
                                                         : "red"
                                             }
                                         >
-                                            {exhibition.Status}
+                                            {exhibition.status}
                                         </Table.Status>
                                     </Table.Cell>
 
@@ -146,10 +152,24 @@ const Exhibitions = () => {
                 </Table>
             </div>
 
-            <div className="flex justify-end mt-[20px]">
+            <div className="flex justify-between mt-[20px]">
+                <p className="text-sm text-midgray">
+                    showing {data.total ? 1 + data.limit * (data.page - 1) : 0}-{Math.min(data.limit * data.page, data.total)} of {data.total}
+                </p>
                 <ActionButtons>
-                    <ActionButtons.Button type="icon" Icon={ChevronLeft} />
-                    <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronLeft}
+                        onClick={() => handlePageChange(page ? page - 1 : 1)}
+                        disabled={page === 1}
+                    />
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronRight}
+                        onClick={() =>
+                            handlePageChange(page ? page + 1 : 1)}
+                        disabled={page === data.totalPages}
+                    />
                 </ActionButtons>
             </div>
 
