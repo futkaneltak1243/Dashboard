@@ -1,164 +1,113 @@
-import { Button } from "../components/Button"
+import { useLocation } from "react-router-dom";
 import { Products as Ps } from "../components/Products"
 import { Searchbar } from "../components/Searchbar";
+import type { Product, ProductFilters } from "../types/product";
+import useFilters from "../hooks/useFilters/useFilters";
+import useFetch from "../hooks/useFetch/useFetch";
+import { useCallback, useState, type ChangeEvent } from "react";
+import { ActionButtons } from "../components/ActionButtons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
-const products = [
-    {
-        images: [
-            "https://picsum.photos/300/300?random=1",
-            "https://picsum.photos/300/300?random=2"
-        ],
-        title: "Modern Leather Wallet",
-        price: 29.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=3",
-            "https://picsum.photos/300/300?random=4"
-        ],
-        title: "Stylish Sunglasses",
-        price: 19.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=5",
-            "https://picsum.photos/300/300?random=6"
-        ],
-        title: "Wireless Bluetooth Headphones",
-        price: 89.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=7",
-            "https://picsum.photos/300/300?random=8"
-        ],
-        title: "Smart Fitness Tracker",
-        price: 49.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=9",
-            "https://picsum.photos/300/300?random=10"
-        ],
-        title: "Minimalist Backpack",
-        price: 59.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=11",
-            "https://picsum.photos/300/300?random=12"
-        ],
-        title: "Portable Power Bank",
-        price: 25.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=13",
-            "https://picsum.photos/300/300?random=14"
-        ],
-        title: "Ergonomic Office Chair",
-        price: 199.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=15",
-            "https://picsum.photos/300/300?random=16"
-        ],
-        title: "Smartphone Stand",
-        price: 15.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=17",
-            "https://picsum.photos/300/300?random=18"
-        ],
-        title: "Compact Digital Camera",
-        price: 129.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=19",
-            "https://picsum.photos/300/300?random=20"
-        ],
-        title: "Bluetooth Smart Speaker",
-        price: 69.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=21",
-            "https://picsum.photos/300/300?random=22"
-        ],
-        title: "LED Desk Lamp",
-        price: 39.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=23",
-            "https://picsum.photos/300/300?random=24"
-        ],
-        title: "Stylish Wristwatch",
-        price: 79.99,
-        isFavorites: false
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=25",
-            "https://picsum.photos/300/300?random=26"
-        ],
-        title: "Portable Coffee Maker",
-        price: 34.99,
-        isFavorites: true
-    },
-    {
-        images: [
-            "https://picsum.photos/300/300?random=27",
-            "https://picsum.photos/300/300?random=28"
-        ],
-        title: "Travel Organizer Set",
-        price: 19.99,
-        isFavorites: false
-    }
-];
-
-
-
-
-type Product = {
-    images: string[];
-    title: string;
-    price: number;
-    isFavorites: boolean;
-};
-
-
+interface Data {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    count: number;
+    data: Product[];
+}
 
 const Favorites = () => {
+    const location = useLocation()
+
+    const { setFilters, get } = useFilters<ProductFilters>()
+    const page = get("page", "number")
+    const initialName = get("name", "string")
+
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.set("isfavorite", "1")
+    const queryString = searchParams.toString()
+    const apiUrl = `/products?${queryString}`
+    const { data, loading, error } = useFetch<Data>(apiUrl)
+
+    console.log(data)
+    const [name, setName] = useState<string>(initialName ? initialName : "")
+
+
+    const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value)
+    }, [])
+
+
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen">
+                <p className="text-red-600 text-2xl mb-2">Oops! Something went wrong.</p>
+                <p className="text-gray-600">{error}</p>
+            </div>
+        );
+    }
+
+    if (!data) return null;
+
+    const products = data.data
+
+    const handlePageChange = (p: number) => {
+        if (p < 1) return
+        if (p > data?.totalPages) return
+        setFilters({ page: p })
+    }
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Favorites</h1>
 
             <div className="mt-7 w-full flex justify-end">
-                <Searchbar color="default" size="sm" placeholder="Search Product..." />
-            </div>
+                <Searchbar
+                    color="default"
+                    size="sm"
+                    placeholder="Search Product..."
+                    buttonClick={() => setFilters({ name: name })}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
+                    value={name}
+                />            </div>
             <div className="mt-4">
                 <Ps>
                     {products.map((product: Product) => {
-                        return product.isFavorites && <Ps.Product images={product.images} title={product.title} price={product.price} isFavorites={product.isFavorites} />
+                        return <Ps.Product key={product.id} images={JSON.parse(product.images)} title={product.name} price={product.price} isFavorites={product.isfavorite} />
                     })}
                 </Ps>
 
+
+            </div>
+            <div className="flex justify-between mt-[20px]">
+                <p className="text-sm text-midgray">
+                    showing {data.total ? 1 + data.limit * (data.page - 1) : 0}-{Math.min(data.limit * data.page, data.total)} of {data.total}
+                </p>
+                <ActionButtons>
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronLeft}
+                        onClick={() => handlePageChange(page ? page - 1 : 1)}
+                        disabled={page === 1}
+                    />
+                    <ActionButtons.Button
+                        type="icon"
+                        Icon={ChevronRight}
+                        onClick={() =>
+                            handlePageChange(page ? page + 1 : 1)}
+                        disabled={page === data.totalPages || data.total === 0}
+                    />
+                </ActionButtons>
             </div>
 
         </div>

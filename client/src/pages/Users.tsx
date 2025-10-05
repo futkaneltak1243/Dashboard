@@ -7,28 +7,16 @@ import { ActionButtons } from "../components/ActionButtons"
 import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
 import { cn } from "../components/classNames"
 import useFetch from "../hooks/useFetch/useFetch"
-import type { UserRole, UserStatus } from "../types/user"
-import { useUserFilters } from "../hooks/filtersHooks/useUserFilters"
+import type { UserRole, UserStatus, User, UserFilters } from "../types/user"
 import { useLocation } from "react-router-dom"
+import useFilters from "../hooks/useFilters/useFilters"
 
-
-
-
-
-interface User {
-    id: number;
-    fullname: string;
-    username: string;
-    email: string;
-    role: UserRole;
-    status: UserStatus;
-    avatar: string | "null";
-
-}
 
 interface Data {
     page: number;
     limit: number;
+    total: number;
+    totalPages: number;
     count: number;
     data: User[];
 }
@@ -37,10 +25,15 @@ const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
 
 const Users = () => {
 
-    const { setFilters, status, role } = useUserFilters()
+    // const { setFilters, status, role, name: initialName, page } = useUserFilters()
+    const { setFilters, get } = useFilters<UserFilters>()
+    const status = get("status", "array")
+    const role = get("role", "array")
+    const initialName = get("name", "string")
+    const page = get("page", "number")
     const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
-    const [name, setName] = useState<string>("")
+    const [name, setName] = useState<string>(initialName ? initialName : "")
     const location = useLocation()
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
@@ -67,6 +60,13 @@ const Users = () => {
         setName(e.target.value)
     }, [])
 
+    const handleResetFilters = useCallback(() => {
+        setFilters({ page: 1, status: [], role: [], name: "" })
+        setName("")
+        setSelectedRoleFilteres([])
+        setSelectedStatusFilters([])
+    }, [setFilters])
+
     const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
 
 
@@ -75,6 +75,11 @@ const Users = () => {
 
     const users = data?.data
     if (!users) return
+    const handlePageChange = (p: number) => {
+        if (p < 1) return
+        if (p > data?.totalPages) return
+        setFilters({ page: p })
+    }
     return (
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
@@ -82,7 +87,10 @@ const Users = () => {
                 <Button>Add User</Button>
             </div>
             <div className="mt-7">
-                <FilterBar breakPoint='md'>
+                <FilterBar
+                    breakPoint='md'
+                    resetButtonClick={handleResetFilters}
+                >
                     <FilterBar.Filter >
                         <FilterBar.Button label="Role" />
                         <FilterBar.Popover title="Select a role" description="*you can choose multible roles" buttonClick={() => setFilters({ role: selectedRoleFiltres })} buttonLabel="Apply Now">
@@ -113,6 +121,7 @@ const Users = () => {
                     placeholder="Search Users..."
                     buttonClick={() => setFilters({ name: name })}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
+                    value={name}
                 />
             </div>
             <div className="mt-4">
@@ -190,10 +199,24 @@ const Users = () => {
 
                     </Table.Body>
                 </Table>
-                <div className="flex justify-end mt-[20px]">
+                <div className="flex justify-between mt-[20px]">
+                    <p className="text-sm text-midgray">
+                        showing {1 + data.limit * (data.page - 1)}-{Math.min(data.limit * data.page, data.total)} of {data.total}
+                    </p>
                     <ActionButtons>
-                        <ActionButtons.Button type="icon" Icon={ChevronLeft} />
-                        <ActionButtons.Button type="icon" Icon={ChevronRight} />
+                        <ActionButtons.Button
+                            type="icon"
+                            Icon={ChevronLeft}
+                            onClick={() => handlePageChange(page ? page - 1 : 1)}
+                            disabled={page === 1}
+                        />
+                        <ActionButtons.Button
+                            type="icon"
+                            Icon={ChevronRight}
+                            onClick={() =>
+                                handlePageChange(page ? page + 1 : 1)}
+                            disabled={page === data.totalPages}
+                        />
                     </ActionButtons>
                 </div>
 

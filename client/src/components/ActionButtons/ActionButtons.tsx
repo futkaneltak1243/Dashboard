@@ -12,6 +12,7 @@ interface ButtonProps {
     size?: "default" | "lg";
     onClick?: () => void;
     iconClass?: string;
+    disabled?: boolean
 }
 
 
@@ -28,7 +29,7 @@ const ActionButtons: FC<ActionButtonsProps> & {
     )
 }
 
-const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onClick, iconClass }) => {
+const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onClick, iconClass, disabled }) => {
     return (
         <button
             className={cn("cursor-pointer bg-[#FAFBFD] dark:bg-[#323D4E] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-[#404B5C] transition",
@@ -38,14 +39,18 @@ const Button: FC<ButtonProps> = ({ type, Icon, children, size = "default", onCli
                     "w-[45px] h-[32px]": size === "default" && type === "icon",
                     "px-[17px] h-[40px]": size === "lg" && type === "text",
                     "px-[17px] h-[32px]": size === "default" && type === "text",
+                    "cursor-default hover:bg-gray-200 bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-600": disabled
                 }
             )}
             onClick={onClick}
+            disabled={disabled}
         >
             {
                 type === "icon" && Icon ?
                     <Icon
-                        className={cn("text-black dark:text-white", iconClass)}
+                        className={cn("text-black dark:text-white", iconClass, {
+                            "opacity-25": disabled,
+                        })}
                         size={18}
                     />
                     : children

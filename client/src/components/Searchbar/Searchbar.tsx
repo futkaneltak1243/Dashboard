@@ -9,7 +9,8 @@ interface SearchbarProps {
     size?: "full" | "lg" | "md" | "sm";
     placeholder?: string;
     buttonClick?: () => void;
-    onChange?: ChangeEventHandler<HTMLInputElement>
+    onChange?: ChangeEventHandler<HTMLInputElement>;
+    value?: string;
 }
 
 
@@ -19,6 +20,7 @@ const SearchInput: FC<SearchbarProps> = ({
     placeholder = "Search...",
     buttonClick,
     onChange,
+    value,
 }) => {
     return (
         <div className={cn("inline-flex w-full", {
@@ -43,9 +45,17 @@ const SearchInput: FC<SearchbarProps> = ({
                         "w-[18px] h-[18px]": size === "md",
                         "w-[16px] h-[16xpx]": size === "sm",
                     })}
+
                 />
             </button>
-            <Input variant={"search"} color={color} size={size} placeholder={placeholder} onChange={onChange} />
+            <Input
+                variant={"search"}
+                color={color}
+                size={size}
+                placeholder={placeholder}
+                onChange={onChange}
+                value={value}
+            />
         </div>
     )
 }
