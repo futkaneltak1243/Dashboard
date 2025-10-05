@@ -3,11 +3,11 @@ import { Button } from "../components/Button"
 import { Products as Ps } from "../components/Products"
 import { Searchbar } from "../components/Searchbar";
 import useFetch from "../hooks/useFetch/useFetch";
-import type { Product } from "../types/product";
-import { useProductFilters } from "../hooks/filtersHooks/useProductFilters";
+import type { ProductFilters, Product } from "../types/product";
 import { useCallback, useState, type ChangeEvent } from "react";
 import { ActionButtons } from "../components/ActionButtons";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import useFilters from "../hooks/useFilters/useFilters";
 
 
 
@@ -26,7 +26,10 @@ const Products = () => {
 
 
     const location = useLocation()
-    const { name: initialName, page, setFilters } = useProductFilters()
+    // const { name: initialName, page, setFilters } = useProductFilters()
+    const { setFilters, get } = useFilters<ProductFilters>()
+    const initialName = get("name", "string")
+    const page = get("page", "number")
     const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
     const [name, setName] = useState<string>(initialName ? initialName : "")
 

@@ -54,7 +54,7 @@ db.serialize(() => {
       company TEXT NOT NULL,
       email TEXT NOT NULL,
       type TEXT NOT NULL,
-      joind TEXT NOT NULL -- store as date string
+      joined TEXT NOT NULL -- store as date string
     );
   `);
 

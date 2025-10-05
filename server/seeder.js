@@ -73,11 +73,11 @@ db.serialize(() => {
     // PARTNERS
     const partnerTypes = ["Supplier", "Distributor", "Investor", "Partner"];
     const insertPartner = db.prepare(`
-    INSERT INTO partners (name, company, email, type, joind) VALUES (?, ?, ?, ?, ?)
+    INSERT INTO partners (name, company, email, type, joined) VALUES (?, ?, ?, ?, ?)
   `);
 
-    const runPartner = (name, company, email, type, joind) => {
-        insertPartner.run([name, company, email, type, joind], (err) => {
+    const runPartner = (name, company, email, type, joined) => {
+        insertPartner.run([name, company, email, type, joined], (err) => {
             if (err) console.error(chalk.red("Failed to insert partner:"), err.message);
         });
     };
