@@ -26,7 +26,6 @@ const Products = () => {
 
 
     const location = useLocation()
-    // const { name: initialName, page, setFilters } = useProductFilters()
     const { setFilters, get } = useFilters<ProductFilters>()
     const initialName = get("name", "string")
     const page = get("page", "number")
@@ -91,7 +90,7 @@ const Products = () => {
                         return <Ps.Product
                             images={JSON.parse(product.images)}
                             title={product.name} price={product.price}
-                            isFavorites={product.isfavorites}
+                            isFavorites={product.isfavorite}
                         />
                     })}
                 </Ps>

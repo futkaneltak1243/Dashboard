@@ -1,8 +1,9 @@
 export type Product = {
+    id: number;
     images: string;
     name: string;
     price: number;
-    isfavorites: 1 | 0;
+    isfavorite: 1 | 0;
 };
 
 export type ProductFilters = {
