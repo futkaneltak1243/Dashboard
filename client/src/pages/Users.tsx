@@ -7,9 +7,9 @@ import { ActionButtons } from "../components/ActionButtons"
 import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
 import { cn } from "../components/classNames"
 import useFetch from "../hooks/useFetch/useFetch"
-import type { UserRole, UserStatus, User } from "../types/user"
-import { useUserFilters } from "../hooks/filtersHooks/useUserFilters"
+import type { UserRole, UserStatus, User, UserFilters } from "../types/user"
 import { useLocation } from "react-router-dom"
+import useFilters from "../hooks/useFilters/useFilters"
 
 
 interface Data {
@@ -25,7 +25,12 @@ const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
 
 const Users = () => {
 
-    const { setFilters, status, role, name: initialName, page } = useUserFilters()
+    // const { setFilters, status, role, name: initialName, page } = useUserFilters()
+    const { setFilters, get } = useFilters<UserFilters>()
+    const status = get("status", "array")
+    const role = get("role", "array")
+    const initialName = get("name", "string")
+    const page = get("page", "number")
     const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
     const [name, setName] = useState<string>(initialName ? initialName : "")
