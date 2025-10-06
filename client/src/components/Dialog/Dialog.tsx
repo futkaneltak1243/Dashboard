@@ -1,6 +1,7 @@
-import { Children, cloneElement, createContext, isValidElement, useContext, useState, type ButtonHTMLAttributes, type FC, type MouseEvent, type ReactElement, type ReactNode } from "react";
+import { Children, cloneElement, createContext, isValidElement, useContext, useState, type FC, type MouseEvent, type ReactElement, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useCloseOnEscape } from "../../hooks/useCloseOnEscape";
+import { usePreventScroll } from "../../hooks/usePreventScroll";
 
 interface IDialogContext {
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,9 +12,8 @@ interface DialogProps {
     children: ReactNode;
 }
 
-interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface TriggerProps {
     children?: ReactNode;
-    className?: string;
 }
 
 interface OverlayProps {
@@ -22,7 +22,7 @@ interface OverlayProps {
 
 interface BodyProps {
     children?: ReactNode;
-    className: string;
+    className?: string;
 }
 
 interface CloseProps {
@@ -51,24 +51,23 @@ const Dialog: FC<DialogProps> & {
     return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>
 }
 
-const Trigger: FC<TriggerProps> = ({ children, className, ...props }) => {
+const Trigger: FC<TriggerProps> = ({ children }) => {
     const { setDialogOpen } = useDialog()
-    return (
-        <button
-            className={className}
-            onClick={() => setDialogOpen(p => !p)}
-            {...props}
-        >
-            {children}
-        </button>
-    )
+    const child = Children.only(children) as ReactElement<{ onClick?: (event: MouseEvent<HTMLElement>) => void }>;
+
+    if (!isValidElement(child)) {
+        console.log("Trigger component expects a valid React element as a child");
+        return null
+    }
+
+    return cloneElement(child, { ...(child.props || {}), onClick: () => setDialogOpen(p => !p) })
 }
 
 const Overlay: FC<OverlayProps> = ({ children }) => {
     const { setDialogOpen } = useDialog()
     return (
         <div
-            className="fixed bg-black/75 h-screen w-screen flex items-center justify-center"
+            className="fixed top-0 left-0 bg-black/75 h-screen w-screen flex items-center justify-center z-50"
             onClick={() => setDialogOpen(false)}
         >
             {children}
@@ -79,14 +78,15 @@ const Overlay: FC<OverlayProps> = ({ children }) => {
 const Body: FC<BodyProps> = ({ className, children }) => {
     const { dialogOpen, setDialogOpen } = useDialog()
     useCloseOnEscape(() => setDialogOpen(false))
+    usePreventScroll(dialogOpen)
     return dialogOpen && createPortal(
         <Overlay>
-            <div className={className}>
+            <div className={className} onClick={e => e.stopPropagation()}>
                 {children}
             </div>
         </Overlay>
         ,
-        document.body
+        document.querySelector("#root") || document.body
     )
 
 }

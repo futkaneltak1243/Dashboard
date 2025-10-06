@@ -10,6 +10,7 @@ import useFetch from "../hooks/useFetch/useFetch"
 import type { UserRole, UserStatus, User, UserFilters } from "../types/user"
 import { useLocation } from "react-router-dom"
 import useFilters from "../hooks/useFilters/useFilters"
+import { FormDialog } from "../components/FormDialog"
 
 
 interface Data {
@@ -84,7 +85,19 @@ const Users = () => {
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
             <div className="flex justify-end mt-4">
-                <Button>Add User</Button>
+                <FormDialog>
+                    <FormDialog.Trigger>
+                        <Button>Add User</Button>
+                    </FormDialog.Trigger>
+                    <FormDialog.Body title="Add User" buttonLabel="Save">
+                        <FormDialog.TextInput label="Full Name" />
+                        <FormDialog.TextInput label="Full Name" />
+                        <FormDialog.TextInput label="Full Name" />
+                        <FormDialog.SelectInput options={["top", "buttom"]} />
+                        <FormDialog.TextInput label="Full Name" full />
+
+                    </FormDialog.Body>
+                </FormDialog>
             </div>
             <div className="mt-7">
                 <FilterBar

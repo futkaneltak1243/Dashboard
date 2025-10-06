@@ -36,7 +36,7 @@ const Dropdown: FC<DropdownProps> & {
 const Button: FC<ButtonProps> = ({ className, label, Icon }) => {
     return (
         <TriggerWithPopover.Trigger>
-            <button className={cn("flex justify-around items-center bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray px-5 py-2 rounded-md border border-lightgray dark:border-darkgray min-w-[170px]", className)}>
+            <button className={cn("flex justify-around items-center bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray px-5 py-2 rounded-md border border-lightgray dark:border-darkgray min-w-[170px] cursor-pointer", className)}>
                 <div className="flex items-center">
                     {Icon && <Icon className="mr-4" />}
                     {label}
