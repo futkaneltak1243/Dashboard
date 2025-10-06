@@ -3,7 +3,6 @@ import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
 import { X } from "lucide-react"
 import { Input } from "../Input";
-import { Dropdown } from "../Dropdown";
 
 interface FormDialogProps {
     children: ReactNode;
@@ -27,8 +26,9 @@ interface TextInputProps {
 }
 
 interface SelectInputProps {
-    options: string[]
-    label?: string
+    options: string[];
+    label?: string;
+    value?: string;
 }
 
 const FormDialog: FC<FormDialogProps> & {
@@ -104,20 +104,36 @@ const TextInput: FC<TextInputProps> = ({ label, value, full = false }) => {
     )
 }
 
-const SelectInput: FC<SelectInputProps> = ({ options, label }) => {
+const SelectInput: FC<SelectInputProps> = ({ options, label, value }) => {
     return (
-        <div>
+        <div className="col-span-1">
             <p
                 className="mb-2"
             >
                 {label}
             </p>
-            <Dropdown>
-                <Dropdown.Button label="hi" />
-                <Dropdown.Menu z={100}>
-                    {options.map((option) => <Dropdown.MenuItem label={option} />)}
-                </Dropdown.Menu>
-            </Dropdown>
+            <div className="relative w-full">
+                <select
+                    className="appearance-none border border-gray-300 rounded-md h-10 w-full pl-3 pr-8"
+                    value={value}
+                >
+                    {options.map((option, index) => (
+                        <option key={index}>{option}</option>
+                    ))}
+                </select>
+                {/* Custom arrow */}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <svg
+                        className="h-4 w-4 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
     )

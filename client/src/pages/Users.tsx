@@ -93,7 +93,7 @@ const Users = () => {
                         <FormDialog.TextInput label="Full Name" />
                         <FormDialog.TextInput label="Full Name" />
                         <FormDialog.TextInput label="Full Name" />
-                        <FormDialog.SelectInput options={["top", "buttom"]} />
+                        <FormDialog.SelectInput options={["top", "buttom"]} label={"select"} />
                         <FormDialog.TextInput label="Full Name" full />
 
                     </FormDialog.Body>
