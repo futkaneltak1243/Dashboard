@@ -23,20 +23,19 @@ interface BodyProps {
     loading?: boolean;
 }
 
-interface TextInputProps {
+interface TextInputProps extends Omit<React.ComponentProps<"input">, "onChange" | "color" | "size"> {
     label?: string;
     value?: string;
     full?: boolean;
-    onChange?: (val: string) => void;
-
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-interface SelectInputProps {
+interface SelectInputProps extends Omit<React.ComponentProps<"select">, "onChange"> {
     options: string[];
     label?: string;
     value?: string;
     full?: boolean;
-    onChange?: (val: string) => void;
+    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const FormDialog: FC<FormDialogProps> & {
@@ -82,10 +81,10 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel, onSubmit
                 </Dialog.Close>
                 <button
                     className={cn(
-                        "h-9  rounded-md flex items-center justify-center transition-colors duration-150",
+                        "h-9 w-21 rounded-md flex items-center justify-center transition-colors duration-150",
                         loading
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed px-3"
-                            : "bg-primary text-white hover:bg-primary-hover cursor-pointer w-21"
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed "
+                            : "bg-primary text-white hover:bg-primary-hover cursor-pointer "
                     )}
                     onClick={onSubmit}
                     disabled={loading}
@@ -93,7 +92,6 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel, onSubmit
                     {loading ? (
                         <div className="flex items-center">
                             <LoaderCircle className="animate-spin w-5 h-5 mr-2" />
-                            <p>Submitting...</p>
                         </div>
                     ) : (
                         buttonLabel
@@ -106,7 +104,7 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel, onSubmit
 }
 
 
-const TextInput: FC<TextInputProps> = ({ label, value, onChange, full = false }) => {
+const TextInput: FC<TextInputProps> = ({ label, value, full = false, onChange, ...props }) => {
     return (
         <div className={cn("flex items-start flex-col", {
             "col-span-2": full
@@ -121,13 +119,14 @@ const TextInput: FC<TextInputProps> = ({ label, value, onChange, full = false })
                 placeholder={label}
                 size="full"
                 value={value}
-                onChange={e => onChange?.(e.target.value)}
+                onChange={e => onChange?.(e)}
+                {...props}
             />
         </div>
     )
 }
 
-const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, full = false }) => {
+const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, full = false, ...props }) => {
     return (
         <div className={cn("w-full", { "col-span-2": full })}>
             <p
@@ -139,7 +138,8 @@ const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, fu
                 <select
                     className="appearance-none border border-gray-300 rounded-md h-10 w-full pl-3 pr-8"
                     value={value}
-                    onChange={e => onChange?.(e.target.value)}
+                    onChange={e => onChange?.(e)}
+                    {...props}
                 >
                     {options.map((option, index) => (
                         <option key={index}>{option}</option>

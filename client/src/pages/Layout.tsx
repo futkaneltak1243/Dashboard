@@ -3,6 +3,7 @@ import { Sidebar } from "../components/Sidebar"
 import { Header } from "../components/Header"
 import { Outlet } from "react-router-dom"
 import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar } from "lucide-react"
+import { Toaster } from "react-hot-toast"
 
 const Layout = () => {
     return (
@@ -29,6 +30,7 @@ const Layout = () => {
             <Dashboard.Content>
                 <Header></Header>
                 <Outlet />
+                <Toaster position="top-right" />
             </Dashboard.Content>
         </Dashboard>
     )
