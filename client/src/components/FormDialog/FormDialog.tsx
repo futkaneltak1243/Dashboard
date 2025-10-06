@@ -1,11 +1,13 @@
 import type { FC, ReactNode } from "react"
 import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
-import { X } from "lucide-react"
+import { X, LoaderCircle } from "lucide-react"
 import { Input } from "../Input";
 
 interface FormDialogProps {
     children: ReactNode;
+    open?: boolean;
+    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface TriggerProps {
@@ -17,18 +19,24 @@ interface BodyProps {
     className?: string;
     title?: string;
     buttonLabel?: string;
+    onSubmit?: () => void;
+    loading?: boolean;
 }
 
 interface TextInputProps {
     label?: string;
     value?: string;
-    full?: boolean
+    full?: boolean;
+    onChange?: (val: string) => void;
+
 }
 
 interface SelectInputProps {
     options: string[];
     label?: string;
     value?: string;
+    full?: boolean;
+    onChange?: (val: string) => void;
 }
 
 const FormDialog: FC<FormDialogProps> & {
@@ -36,15 +44,15 @@ const FormDialog: FC<FormDialogProps> & {
     Body: FC<BodyProps>,
     TextInput: FC<TextInputProps>,
     SelectInput: FC<SelectInputProps>,
-} = ({ children }) => {
-    return <Dialog>{children}</Dialog>
+} = ({ children, open, setOpen }) => {
+    return <Dialog open={open} setOpen={setOpen}>{children}</Dialog>
 }
 
 const Trigger: FC<TriggerProps> = ({ children }) => {
     return <Dialog.Trigger>{children}</Dialog.Trigger>
 }
 
-const Body: FC<BodyProps> = ({ children, className, title, buttonLabel }) => {
+const Body: FC<BodyProps> = ({ children, className, title, buttonLabel, onSubmit, loading = false }) => {
     return (
         <Dialog.Body
             className={cn("bg-items-light dark:bg-items-dark px-6 pb-6 pt-10 relative shadow-xl w-[min(90%,600px)] rounded-lg",
@@ -72,11 +80,25 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel }) => {
                         Cancel
                     </button>
                 </Dialog.Close>
-                <Dialog.Close>
-                    <button className="bg-primary h-9 w-21 text-white rounded-md cursor-pointer hover:bg-primary-hover transition-colors duration-150">
-                        {buttonLabel}
-                    </button>
-                </Dialog.Close>
+                <button
+                    className={cn(
+                        "h-9  rounded-md flex items-center justify-center transition-colors duration-150",
+                        loading
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed px-3"
+                            : "bg-primary text-white hover:bg-primary-hover cursor-pointer w-21"
+                    )}
+                    onClick={onSubmit}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <div className="flex items-center">
+                            <LoaderCircle className="animate-spin w-5 h-5 mr-2" />
+                            <p>Submitting...</p>
+                        </div>
+                    ) : (
+                        buttonLabel
+                    )}
+                </button>
             </div>
 
         </Dialog.Body>
@@ -84,7 +106,7 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel }) => {
 }
 
 
-const TextInput: FC<TextInputProps> = ({ label, value, full = false }) => {
+const TextInput: FC<TextInputProps> = ({ label, value, onChange, full = false }) => {
     return (
         <div className={cn("flex items-start flex-col", {
             "col-span-2": full
@@ -99,14 +121,15 @@ const TextInput: FC<TextInputProps> = ({ label, value, full = false }) => {
                 placeholder={label}
                 size="full"
                 value={value}
+                onChange={e => onChange?.(e.target.value)}
             />
         </div>
     )
 }
 
-const SelectInput: FC<SelectInputProps> = ({ options, label, value }) => {
+const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, full = false }) => {
     return (
-        <div className="col-span-1">
+        <div className={cn("w-full", { "col-span-2": full })}>
             <p
                 className="mb-2"
             >
@@ -116,6 +139,7 @@ const SelectInput: FC<SelectInputProps> = ({ options, label, value }) => {
                 <select
                     className="appearance-none border border-gray-300 rounded-md h-10 w-full pl-3 pr-8"
                     value={value}
+                    onChange={e => onChange?.(e.target.value)}
                 >
                     {options.map((option, index) => (
                         <option key={index}>{option}</option>

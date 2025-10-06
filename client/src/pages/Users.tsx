@@ -89,7 +89,7 @@ const Users = () => {
                     <FormDialog.Trigger>
                         <Button>Add User</Button>
                     </FormDialog.Trigger>
-                    <FormDialog.Body title="Add User" buttonLabel="Save">
+                    <FormDialog.Body title="Add User" buttonLabel="Save" loading={false}>
                         <FormDialog.TextInput label="Full Name" />
                         <FormDialog.TextInput label="Full Name" />
                         <FormDialog.TextInput label="Full Name" />
