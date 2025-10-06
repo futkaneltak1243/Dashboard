@@ -5,6 +5,7 @@ import { cn } from "../classNames"
 
 interface DropdownProps {
     children: ReactNode;
+    className?: string;
 }
 
 interface ButtonProps {
@@ -16,6 +17,7 @@ interface ButtonProps {
 interface MenuProps {
     className?: string;
     children: ReactNode;
+    z?: number;
 }
 
 interface MenuItemProps {
@@ -29,28 +31,27 @@ const Dropdown: FC<DropdownProps> & {
     Button: FC<ButtonProps>,
     Menu: FC<MenuProps>,
     MenuItem: FC<MenuItemProps>
-} = ({ children }) => {
-    return <TriggerWithPopover>{children}</TriggerWithPopover>
+} = ({ children, className }) => {
+    return <TriggerWithPopover className={className}>{children}</TriggerWithPopover>
 }
 
 const Button: FC<ButtonProps> = ({ className, label, Icon }) => {
     return (
-        <TriggerWithPopover.Trigger>
-            <button className={cn("flex justify-around items-center bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray px-5 py-2 rounded-md border border-lightgray dark:border-darkgray min-w-[170px]", className)}>
-                <div className="flex items-center">
-                    {Icon && <Icon className="mr-4" />}
-                    {label}
-                </div>
-                <ChevronDown className="ml-2" />
-            </button>
+        <TriggerWithPopover.Trigger className={cn("flex justify-between items-center bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray px-5 py-2 rounded-md border border-lightgray dark:border-darkgray min-w-[170px] cursor-pointer", className)}>
+            <div className="flex items-center">
+                {Icon && <Icon className="mr-4" />}
+                {label}
+            </div>
+            <ChevronDown className="ml-2" />
         </TriggerWithPopover.Trigger>
     )
 }
 
-const Menu: FC<MenuProps> = ({ className, children }) => {
+const Menu: FC<MenuProps> = ({ className, children, z }) => {
     return (
         <TriggerWithPopover.Popover
             className={cn("flex flex-col items-start w-[150px] bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray rounded-md border border-lightgray dark:border-darkgray divide-y divide-lightgray dark:divide-darkgray ", className)}
+            z={z}
         >
             {children}
         </TriggerWithPopover.Popover>
