@@ -3,6 +3,7 @@ import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
 import { X } from "lucide-react"
 import { Input } from "../Input";
+import { Dropdown } from "../Dropdown";
 
 interface FormDialogProps {
     children: ReactNode;
@@ -111,6 +112,12 @@ const SelectInput: FC<SelectInputProps> = ({ options, label }) => {
             >
                 {label}
             </p>
+            <Dropdown>
+                <Dropdown.Button label="hi" />
+                <Dropdown.Menu z={100}>
+                    {options.map((option) => <Dropdown.MenuItem label={option} />)}
+                </Dropdown.Menu>
+            </Dropdown>
         </div>
 
     )

@@ -26,6 +26,7 @@ interface PopoverProps {
     offsetY?: number;
     offsetX?: number;
     side?: boolean;
+    z?: number;
 }
 
 interface CloseProps {
@@ -87,7 +88,7 @@ const Trigger: FC<TriggerProps> = ({ children, className, onClick, ...rest }) =>
 }
     ;
 
-const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = false, offsetY = 0, offsetX = 0, side = false }) => {
+const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = false, z, offsetY = 0, offsetX = 0, side = false }) => {
 
     const { triggerRef, setPopoverOpen, popoverOpen } = useTriggerWithPopover()
     const [popoverX, setX] = useState(0)
@@ -146,19 +147,20 @@ const Popover: FC<PopoverProps> = ({ children, className, fullOnSmallScreen = fa
 
 
     return createPortal(
-        <div className={cn("absolute z-40", className, {
+        <div className={cn("absolute", className, {
             "hidden": !popoverOpen,
             "w-full sm:w-fit": fullOnSmallScreen
         })}
             style={{
                 top: popoverY,
                 left: popoverX,
+                zIndex: z ? z : "auto"
             }}
             ref={popoverRef}
         >
             {children}
         </div>,
-        document.body
+        document.querySelector("#root") || document.body
     )
 }
 

@@ -16,6 +16,7 @@ interface ButtonProps {
 interface MenuProps {
     className?: string;
     children: ReactNode;
+    z?: number;
 }
 
 interface MenuItemProps {
@@ -47,10 +48,11 @@ const Button: FC<ButtonProps> = ({ className, label, Icon }) => {
     )
 }
 
-const Menu: FC<MenuProps> = ({ className, children }) => {
+const Menu: FC<MenuProps> = ({ className, children, z }) => {
     return (
         <TriggerWithPopover.Popover
             className={cn("flex flex-col items-start w-[150px] bg-layout-light dark:bg-items-dark2 dark:text-lightgray text-darkgray rounded-md border border-lightgray dark:border-darkgray divide-y divide-lightgray dark:divide-darkgray ", className)}
+            z={z}
         >
             {children}
         </TriggerWithPopover.Popover>

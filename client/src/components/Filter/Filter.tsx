@@ -130,7 +130,7 @@ const FilterBar: FC<FilterBarProps> & {
                     <TriggerWithPopover.Trigger >
                         <FilterIconBox />
                     </TriggerWithPopover.Trigger>
-                    <TriggerWithPopover.Popover className="z-10" offsetX={50}>
+                    <TriggerWithPopover.Popover z={10} offsetX={50}>
                         <div className="flex flex-col rounded-xl overflow-hidden border border-lightgray divide-lightgray dark:border-darkgray dark:divide-darkgray divide-y">
                             {children}
                         </div>
@@ -307,6 +307,7 @@ const Popover: FC<PopoverProps> = ({ className, title, description, children, bu
             offsetY={offsetY}
             offsetX={isScreenSmall ? offsetX + 4 : offsetX}
             side={isScreenSmall}
+            z={20}
         >
             <h1 className="pt-3 pl-[24px] font-semibold text-lg text-left">
                 {title}
