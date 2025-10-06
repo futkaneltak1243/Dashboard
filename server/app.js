@@ -1,6 +1,7 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 const db = new sqlite3.Database("database.db");
@@ -58,42 +59,53 @@ app.get("/api/users", (req, res) => {
     });
 });
 
-app.post("/api/users", (req, res) => {
-    const { fullname, username, email, role, status, avatar = null } = req.body;
+
+
+// Make sure your table has a `password` column (TEXT)
+app.post("/api/users", async (req, res) => {
+    const { fullname, username, email, role, status, avatar = null, password } = req.body;
 
     // Simple validation
-    if (!fullname || !username || !email || !role || !status) {
-        return res.status(400).json({ error: "fullname, username, email, role, and status are required." });
+    if (!fullname || !username || !email || !role || !status || !password) {
+        return res.status(400).json({ error: "fullname, username, email, role, status, and password are required." });
     }
 
-    const sql = `
-        INSERT INTO users (fullname, username, email, role, status, avatar)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const params = [fullname, username, email, role, status, avatar];
+    try {
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    db.run(sql, params, function (err) {
-        if (err) {
-            if (err.message.includes("UNIQUE constraint failed")) {
-                return res.status(409).json({ error: "Username or email already exists." });
+        const sql = `
+            INSERT INTO users (fullname, username, email, role, status, avatar, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const params = [fullname, username, email, role, status, avatar, hashedPassword];
+
+        db.run(sql, params, function (err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    return res.status(409).json({ error: "Username or email already exists." });
+                }
+                return res.status(500).json({ error: err.message });
             }
-            return res.status(500).json({ error: err.message });
-        }
 
-        // Return the newly created user
-        const newUser = {
-            id: this.lastID,
-            fullname,
-            username,
-            email,
-            role,
-            status,
-            avatar
-        };
+            // Return the newly created user (never return the password!)
+            const newUser = {
+                id: this.lastID,
+                fullname,
+                username,
+                email,
+                role,
+                status,
+                avatar
+            };
 
-        res.status(201).json({ message: "User created successfully", data: newUser });
-    });
+            res.status(201).json({ message: "User created successfully", data: newUser });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to hash password." });
+    }
 });
+
 
 /** 🔹 PRODUCTS API */
 app.get("/api/products", (req, res) => {

@@ -44,6 +44,7 @@ const Users = () => {
         email: "",
         role: "Admin",
         status: "active",
+        password: "",
 
     })
     const location = useLocation()
@@ -56,7 +57,8 @@ const Users = () => {
             username: "",
             email: "",
             role: "Admin",
-            status: "active"
+            status: "active",
+            password: ""
         });
     }
 
@@ -146,6 +148,30 @@ const Users = () => {
                             value={formData["fullname"]}
                             onChange={handleFormDataChange}
                         />
+
+                        <FormDialog.TextInput
+                            label="Username"
+                            name="username"
+                            value={formData["username"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Email"
+                            name="email"
+                            value={formData["email"]}
+                            onChange={handleFormDataChange}
+                            type="email"
+                        />
+
+                        <FormDialog.TextInput
+                            label="Password"
+                            name="password"
+                            value={formData["password"]}
+                            onChange={handleFormDataChange}
+                            type="password"
+                        />
+
                         <FormDialog.SelectInput
                             label="Role"
                             name="role"
@@ -153,12 +179,7 @@ const Users = () => {
                             value={formData["role"]}
                             onChange={handleFormDataChange}
                         />
-                        <FormDialog.TextInput
-                            label="Username"
-                            name="username"
-                            value={formData["username"]}
-                            onChange={handleFormDataChange}
-                        />
+
                         <FormDialog.SelectInput
                             options={statusFilters}
                             name="status"
@@ -166,14 +187,7 @@ const Users = () => {
                             value={formData["status"]}
                             onChange={handleFormDataChange}
                         />
-                        <FormDialog.TextInput
-                            label="Email"
-                            name="email"
-                            value={formData["email"]}
-                            onChange={handleFormDataChange}
-                            full
-                            type="email"
-                        />
+
 
                     </FormDialog.Body>
                 </FormDialog>
