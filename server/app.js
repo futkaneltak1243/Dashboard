@@ -6,7 +6,7 @@ const app = express();
 const db = new sqlite3.Database("database.db");
 
 app.use(cors());
-
+app.use(express.json());
 /** 🔹 USERS API */
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
@@ -55,6 +55,43 @@ app.get("/api/users", (req, res) => {
                 data: rows,
             });
         });
+    });
+});
+
+app.post("/api/users", (req, res) => {
+    const { fullname, username, email, role, status, avatar = null } = req.body;
+
+    // Simple validation
+    if (!fullname || !username || !email || !role || !status) {
+        return res.status(400).json({ error: "fullname, username, email, role, and status are required." });
+    }
+
+    const sql = `
+        INSERT INTO users (fullname, username, email, role, status, avatar)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const params = [fullname, username, email, role, status, avatar];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            if (err.message.includes("UNIQUE constraint failed")) {
+                return res.status(409).json({ error: "Username or email already exists." });
+            }
+            return res.status(500).json({ error: err.message });
+        }
+
+        // Return the newly created user
+        const newUser = {
+            id: this.lastID,
+            fullname,
+            username,
+            email,
+            role,
+            status,
+            avatar
+        };
+
+        res.status(201).json({ message: "User created successfully", data: newUser });
     });
 });
 
