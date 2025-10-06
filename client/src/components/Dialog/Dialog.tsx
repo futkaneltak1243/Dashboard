@@ -10,6 +10,8 @@ interface IDialogContext {
 
 interface DialogProps {
     children: ReactNode;
+    open?: boolean;
+    setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface TriggerProps {
@@ -42,12 +44,13 @@ const Dialog: FC<DialogProps> & {
     Trigger: FC<TriggerProps>,
     Body: FC<BodyProps>,
     Close: FC<CloseProps>
-} = ({ children }) => {
+} = ({ children, open, setOpen }) => {
     const [dialogOpen, setDialogOpen] = useState(false)
-    const value = {
-        dialogOpen,
-        setDialogOpen
-    }
+
+    const value = open !== undefined && setOpen
+        ? { dialogOpen: open, setDialogOpen: setOpen }
+        : { dialogOpen, setDialogOpen };
+
     return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>
 }
 
