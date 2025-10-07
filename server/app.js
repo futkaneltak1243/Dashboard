@@ -109,49 +109,59 @@ app.put("/api/users/:id", async (req, res) => {
     const { id } = req.params;
     const { fullname, username, email, role, status, avatar = null, password } = req.body;
 
-    // Validate input
     if (!fullname || !username || !email || !role || !status) {
         return res.status(400).json({ error: "fullname, username, email, role, and status are required." });
     }
 
     try {
-        const fields = ["fullname", "username", "email", "role", "status", "avatar"];
-        const params = [fullname, username, email, role, status, avatar];
+        // Check if user exists and whether they are a Super Admin
+        db.get("SELECT role FROM users WHERE id = ?", [id], async (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (!user) return res.status(404).json({ error: "User not found." });
 
-        // Handle password if provided
-        if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            fields.push("password");
-            params.push(hashedPassword);
-        }
+            // Prevent updating Super Admin
+            if (user.role === "Super Admin") {
+                return res.status(400).json({ error: "You cannot update a Super Admin." });
+            }
 
-        const setClause = fields.map(field => `${field} = ?`).join(", ");
-        const sql = `UPDATE users SET ${setClause} WHERE id = ?`;
-        params.push(id);
+            const fields = ["fullname", "username", "email", "role", "status", "avatar"];
+            const params = [fullname, username, email, role, status, avatar];
 
-        db.run(sql, params, function (err) {
-            if (err) {
-                if (err.message.includes("UNIQUE constraint failed")) {
-                    return res.status(409).json({ error: "Username or email already exists." });
+            // Handle password if provided
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                fields.push("password");
+                params.push(hashedPassword);
+            }
+
+            const setClause = fields.map(field => `${field} = ?`).join(", ");
+            const sql = `UPDATE users SET ${setClause} WHERE id = ?`;
+            params.push(id);
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    if (err.message.includes("UNIQUE constraint failed")) {
+                        return res.status(409).json({ error: "Username or email already exists." });
+                    }
+                    return res.status(500).json({ error: err.message });
                 }
-                return res.status(500).json({ error: err.message });
-            }
 
-            if (this.changes === 0) {
-                return res.status(404).json({ error: "User not found." });
-            }
+                if (this.changes === 0) {
+                    return res.status(404).json({ error: "User not found." });
+                }
 
-            res.status(200).json({
-                message: "User updated successfully",
-                data: {
-                    id: Number(id),
-                    fullname,
-                    username,
-                    email,
-                    role,
-                    status,
-                    avatar
-                },
+                res.status(200).json({
+                    message: "User updated successfully",
+                    data: {
+                        id: Number(id),
+                        fullname,
+                        username,
+                        email,
+                        role,
+                        status,
+                        avatar
+                    },
+                });
             });
         });
     } catch (err) {
@@ -159,49 +169,6 @@ app.put("/api/users/:id", async (req, res) => {
     }
 });
 
-
-/** 🔹 PRODUCTS API */
-app.get("/api/products", (req, res) => {
-    const { name, isfavorite, page = 1, limit = 10 } = req.query;
-    const filters = [];
-    const params = [];
-
-    if (name) {
-        filters.push(`name LIKE ?`);
-        params.push(`%${name}%`);
-    }
-
-    if (isfavorite !== undefined) {
-        filters.push(`isfavorite = ?`);
-        params.push(parseInt(isfavorite));
-    }
-
-    const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-
-    const baseSql = `FROM products ${whereClause}`;
-    const sql = `SELECT * ${baseSql} LIMIT ? OFFSET ?`;
-    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
-    const finalParams = [...params, parseInt(limit), offset];
-
-    db.get(countSql, params, (err, countResult) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        db.all(sql, finalParams, (err, rows) => {
-            if (err) return res.status(500).json({ error: err.message });
-
-            const total = countResult.total;
-            res.status(200).json({
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                totalPages: Math.ceil(total / limit),
-                count: rows.length,
-                data: rows,
-            });
-        });
-    });
-});
 
 /** 🔹 PARTNERS API */
 app.get("/api/partners", (req, res) => {
