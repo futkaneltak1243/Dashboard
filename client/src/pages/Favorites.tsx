@@ -83,7 +83,7 @@ const Favorites = () => {
             <div className="mt-4">
                 <Ps>
                     {products.map((product: Product) => {
-                        return <Ps.Product key={product.id} images={JSON.parse(product.images)} title={product.name} price={product.price} isFavorites={product.isfavorite} />
+                        return <Ps.Product key={product.id} images={product.images} title={product.name} price={product.price} isFavorites={product.isfavorite} />
                     })}
                 </Ps>
 

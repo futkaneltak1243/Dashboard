@@ -59,6 +59,7 @@ const Products = () => {
     if (!data) return null;
 
     const products = data.data
+    console.log(products)
 
     const handlePageChange = (p: number) => {
         if (p < 1) return
@@ -88,7 +89,7 @@ const Products = () => {
                 <Ps>
                     {products?.map((product: Product) => {
                         return <Ps.Product
-                            images={JSON.parse(product.images)}
+                            images={product.images}
                             title={product.name} price={product.price}
                             isFavorites={product.isfavorite}
                         />
