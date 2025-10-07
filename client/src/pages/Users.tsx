@@ -1,16 +1,19 @@
-import { useCallback, useState, type ChangeEvent } from "react"
+import { useCallback, useEffect, useState, type ChangeEvent } from "react"
 import { Button } from "../components/Button"
 import { FilterBar } from "../components/Filter"
 import { Table } from "../components/Table"
 import { Searchbar } from "../components/Searchbar"
 import { ActionButtons } from "../components/ActionButtons"
-import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, SquarePen, Trash2, TriangleAlert } from "lucide-react"
 import { cn } from "../components/classNames"
 import useFetch from "../hooks/useFetch/useFetch"
 import type { UserRole, UserStatus, User, UserFilters } from "../types/user"
 import { useLocation } from "react-router-dom"
 import useFilters from "../hooks/useFilters/useFilters"
 import { FormDialog } from "../components/FormDialog"
+import { handleSubmit } from "../utils/handleSubmit"
+import toast from "react-hot-toast"
+import ConfirmationDialog from "../components/ConfirmationDialog/ConfirmationDialog"
 
 
 interface Data {
@@ -26,7 +29,6 @@ const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
 
 const Users = () => {
 
-    // const { setFilters, status, role, name: initialName, page } = useUserFilters()
     const { setFilters, get } = useFilters<UserFilters>()
     const status = get("status", "array")
     const role = get("role", "array")
@@ -35,7 +37,121 @@ const Users = () => {
     const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
     const [name, setName] = useState<string>(initialName ? initialName : "")
+    const [isCeateFormSubmitting, setIsCeateFormSubmitting] = useState(false)
+    const [createFormOpen, setCreateFormOpen] = useState(false)
+    const [formData, setFormData] = useState({
+        fullname: "",
+        username: "",
+        email: "",
+        role: "Admin",
+        status: "active",
+        password: "",
+
+    })
+    const [editFormOpen, setEditFormOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
+
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
+    const [isUserDeleting, setIsUserDeleting] = useState(false)
+
     const location = useLocation()
+
+    const { data, loading, error, refetch } = useFetch<Data>(location.pathname + location.search)
+
+    const resetFormData = () => {
+        setFormData({
+            fullname: "",
+            username: "",
+            email: "",
+            role: "Admin",
+            status: "active",
+            password: ""
+        });
+    }
+
+    const handleEditClick = (user: User) => {
+        setSelectedUser(user);
+        setFormData({
+            fullname: user.fullname,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            password: "", // leave empty unless changing
+        });
+        setEditFormOpen(true);
+    };
+
+    const handleDeleteClick = (user: User) => {
+        setSelectedUser(user);
+        setConfirmationOpen(true)
+    }
+
+    useEffect(() => {
+        if (!createFormOpen) {
+            resetFormData()
+        }
+    }, [createFormOpen]);
+
+    const handleFormDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleCreateFormSubmit = () => {
+        handleSubmit({
+            url: "/users",
+            method: "POST",
+            data: formData,
+            onSuccess: () => {
+                resetFormData();
+                toast.success("user added successfully");
+                setCreateFormOpen(false)
+                refetch()
+            },
+            onError: (err) => { toast.error(err) },
+            setLoading: setIsCeateFormSubmitting
+        })
+    }
+
+    const handleEditFormSubmit = () => {
+        if (!selectedUser) return;
+        handleSubmit({
+            url: `/users/${selectedUser.id}`,
+            method: "PUT",
+            data: formData,
+            onSuccess: () => {
+                toast.success("User updated successfully");
+                setEditFormOpen(false);
+                resetFormData();
+                setSelectedUser(null);
+                refetch();
+            },
+            onError: (err) => toast.error(err),
+            setLoading: setIsEditFormSubmitting,
+        });
+    };
+
+
+    const handleDelete = () => {
+        if (!selectedUser) return;
+
+        handleSubmit({
+            url: `/users/${selectedUser.id}`,
+            method: "DELETE",
+            onSuccess: () => {
+                toast.success("User deleted successfully");
+                setSelectedUser(null);
+                setConfirmationOpen(false);
+                refetch();
+            },
+            onError: (err) => {
+                toast.error(err);
+            },
+            setLoading: setIsUserDeleting, // optional: if you have a delete loading state
+        });
+    };
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
         setSelectedRoleFilteres((prev: UserRole[]) => {
@@ -68,7 +184,6 @@ const Users = () => {
         setSelectedStatusFilters([])
     }, [setFilters])
 
-    const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
 
 
     if (loading) return <p>Loading users...</p>;
@@ -85,16 +200,122 @@ const Users = () => {
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
             <div className="flex justify-end mt-4">
-                <FormDialog>
+                <ConfirmationDialog open={confirmationOpen} setOpen={setConfirmationOpen}>
+                    <ConfirmationDialog.Body
+                        Icon={TriangleAlert}
+                        title="Delete User"
+                        description="Are you sure you want to delete this user? this action can not be undone."
+                        buttonLabel="Delete"
+                        loading={isUserDeleting}
+                        onSubmit={handleDelete}
+                        iconClass="text-red-600 w-9 h-9"
+                    />
+                </ConfirmationDialog>
+                <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
+                    <FormDialog.Body
+                        title="Edit User"
+                        buttonLabel="Update"
+                        loading={isEditFormSubmitting}
+                        onSubmit={handleEditFormSubmit}
+                    >
+                        <FormDialog.TextInput
+                            label="Full Name"
+                            name="fullname"
+                            value={formData["fullname"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Username"
+                            name="username"
+                            value={formData["username"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Email"
+                            name="email"
+                            value={formData["email"]}
+                            onChange={handleFormDataChange}
+                            type="email"
+                        />
+
+                        <FormDialog.TextInput
+                            label="Password"
+                            name="password"
+                            value={formData["password"]}
+                            onChange={handleFormDataChange}
+                            type="password"
+                        />
+
+                        <FormDialog.SelectInput
+                            label="Role"
+                            name="role"
+                            options={roleFilters.filter(role => role !== "Super Admin")}
+                            value={formData["role"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.SelectInput
+                            options={statusFilters}
+                            name="status"
+                            label="Status"
+                            value={formData["status"]}
+                            onChange={handleFormDataChange}
+                        />
+                    </FormDialog.Body>
+                </FormDialog>
+                <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
                     <FormDialog.Trigger>
                         <Button>Add User</Button>
                     </FormDialog.Trigger>
-                    <FormDialog.Body title="Add User" buttonLabel="Save" loading={false}>
-                        <FormDialog.TextInput label="Full Name" />
-                        <FormDialog.TextInput label="Full Name" />
-                        <FormDialog.TextInput label="Full Name" />
-                        <FormDialog.SelectInput options={["top", "buttom"]} label={"select"} />
-                        <FormDialog.TextInput label="Full Name" full />
+                    <FormDialog.Body title="Add User" buttonLabel="Save" loading={isCeateFormSubmitting} onSubmit={handleCreateFormSubmit}>
+                        <FormDialog.TextInput
+                            label="Full Name"
+                            name="fullname"
+                            value={formData["fullname"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Username"
+                            name="username"
+                            value={formData["username"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Email"
+                            name="email"
+                            value={formData["email"]}
+                            onChange={handleFormDataChange}
+                            type="email"
+                        />
+
+                        <FormDialog.TextInput
+                            label="Password"
+                            name="password"
+                            value={formData["password"]}
+                            onChange={handleFormDataChange}
+                            type="password"
+                        />
+
+                        <FormDialog.SelectInput
+                            label="Role"
+                            name="role"
+                            options={roleFilters.filter(role => role !== "Super Admin")}
+                            value={formData["role"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.SelectInput
+                            options={statusFilters}
+                            name="status"
+                            label="Status"
+                            value={formData["status"]}
+                            onChange={handleFormDataChange}
+                        />
+
 
                     </FormDialog.Body>
                 </FormDialog>
@@ -202,8 +423,17 @@ const Users = () => {
                                     </Table.Cell>
                                     <Table.Cell centered>
                                         <ActionButtons>
-                                            <ActionButtons.Button Icon={SquarePen} type="icon" />
-                                            <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
+                                            <ActionButtons.Button
+                                                Icon={SquarePen}
+                                                type="icon"
+                                                onClick={() => handleEditClick(user)}
+                                            />
+                                            <ActionButtons.Button
+                                                Icon={Trash2}
+                                                type="icon"
+                                                iconClass="text-red-600 dark:text-red-400"
+                                                onClick={() => handleDeleteClick(user)}
+                                            />
                                         </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>

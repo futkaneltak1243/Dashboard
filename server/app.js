@@ -1,12 +1,13 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 const db = new sqlite3.Database("database.db");
 
 app.use(cors());
-
+app.use(express.json());
 /** 🔹 USERS API */
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
@@ -58,45 +59,135 @@ app.get("/api/users", (req, res) => {
     });
 });
 
-/** 🔹 PRODUCTS API */
-app.get("/api/products", (req, res) => {
-    const { name, isfavorite, page = 1, limit = 10 } = req.query;
-    const filters = [];
-    const params = [];
 
-    if (name) {
-        filters.push(`name LIKE ?`);
-        params.push(`%${name}%`);
+
+app.post("/api/users", async (req, res) => {
+    const { fullname, username, email, role, status, avatar = null, password } = req.body;
+
+    // Simple validation
+    if (!fullname || !username || !email || !role || !status || !password) {
+        return res.status(400).json({ error: "fullname, username, email, role, status, and password are required." });
     }
 
-    if (isfavorite !== undefined) {
-        filters.push(`isfavorite = ?`);
-        params.push(parseInt(isfavorite));
+    try {
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const sql = `
+            INSERT INTO users (fullname, username, email, role, status, avatar, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const params = [fullname, username, email, role, status, avatar, hashedPassword];
+
+        db.run(sql, params, function (err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    return res.status(409).json({ error: "Username or email already exists." });
+                }
+                return res.status(500).json({ error: err.message });
+            }
+
+            // Return the newly created user (never return the password!)
+            const newUser = {
+                id: this.lastID,
+                fullname,
+                username,
+                email,
+                role,
+                status,
+                avatar
+            };
+
+            res.status(201).json({ message: "User created successfully", data: newUser });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to hash password." });
+    }
+});
+
+app.put("/api/users/:id", async (req, res) => {
+    const { id } = req.params;
+    const { fullname, username, email, role, status, avatar = null, password } = req.body;
+
+    if (!fullname || !username || !email || !role || !status) {
+        return res.status(400).json({ error: "fullname, username, email, role, and status are required." });
     }
 
-    const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-
-    const baseSql = `FROM products ${whereClause}`;
-    const sql = `SELECT * ${baseSql} LIMIT ? OFFSET ?`;
-    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
-    const finalParams = [...params, parseInt(limit), offset];
-
-    db.get(countSql, params, (err, countResult) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        db.all(sql, finalParams, (err, rows) => {
+    try {
+        // Check if user exists and whether they are a Super Admin
+        db.get("SELECT role FROM users WHERE id = ?", [id], async (err, user) => {
             if (err) return res.status(500).json({ error: err.message });
+            if (!user) return res.status(404).json({ error: "User not found." });
 
-            const total = countResult.total;
-            res.status(200).json({
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                totalPages: Math.ceil(total / limit),
-                count: rows.length,
-                data: rows,
+            // Prevent updating Super Admin
+            if (user.role === "Super Admin") {
+                return res.status(400).json({ error: "You cannot update a Super Admin." });
+            }
+
+            const fields = ["fullname", "username", "email", "role", "status", "avatar"];
+            const params = [fullname, username, email, role, status, avatar];
+
+            // Handle password if provided
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                fields.push("password");
+                params.push(hashedPassword);
+            }
+
+            const setClause = fields.map(field => `${field} = ?`).join(", ");
+            const sql = `UPDATE users SET ${setClause} WHERE id = ?`;
+            params.push(id);
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    if (err.message.includes("UNIQUE constraint failed")) {
+                        return res.status(409).json({ error: "Username or email already exists." });
+                    }
+                    return res.status(500).json({ error: err.message });
+                }
+
+                if (this.changes === 0) {
+                    return res.status(404).json({ error: "User not found." });
+                }
+
+                res.status(200).json({
+                    message: "User updated successfully",
+                    data: {
+                        id: Number(id),
+                        fullname,
+                        username,
+                        email,
+                        role,
+                        status,
+                        avatar
+                    },
+                });
             });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update user." });
+    }
+});
+
+app.delete("/api/users/:id", (req, res) => {
+    const { id } = req.params;
+
+    // First, check if the user exists and their role
+    db.get("SELECT role FROM users WHERE id = ?", [id], (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!user) return res.status(404).json({ error: "User not found." });
+
+        // Prevent deleting Super Admin
+        if (user.role === "Super Admin") {
+            return res.status(400).json({ error: "You cannot delete a Super Admin." });
+        }
+
+        // Proceed to delete
+        db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: "User not found." });
+
+            res.status(200).json({ message: "User deleted successfully", id: Number(id) });
         });
     });
 });

@@ -1,6 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
 const { faker } = require("@faker-js/faker");
 const chalk = require("chalk");
+const bcrypt = require("bcryptjs");
 
 // Open database
 const db = new sqlite3.Database("database.db", (err) => {
@@ -17,13 +18,22 @@ db.serialize(() => {
     const statuses = ["active", "inactive", "pending"];
 
     const insertUser = db.prepare(`
-    INSERT INTO users (fullname, username, email, role, status, avatar) VALUES (?, ?, ?, ?, ?, ?)
-  `);
+        INSERT INTO users (fullname, username, email, password, role, status, avatar) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+
 
     const runUser = (fullname, username, email, role, status, avatar) => {
-        insertUser.run([fullname, username, email, role, status, avatar], (err) => {
-            if (err) console.error(chalk.red("Failed to insert user:"), err.message);
-        });
+        // Generate a random password
+        const plainPassword = faker.internet.password({ length: 10 });
+        // Hash the password before storing
+        const hashedPassword = bcrypt.hashSync(plainPassword, 10);
+
+        insertUser.run(
+            [fullname, username, email, hashedPassword, role, status, avatar],
+            (err) => {
+                if (err) console.error(chalk.red("Failed to insert user:"), err.message);
+            }
+        );
     };
 
     runUser("Furkan Eltakriti", "furkaneltakriti", "ft.142001@gmail.com", "Super Admin", "active", null);
