@@ -1,66 +1,61 @@
-import { useState, type Dispatch, type FC, type SetStateAction } from "react";
+import { useEffect, useState, type FC } from "react"
 import { FormDialog } from "../../components/FormDialog"
-import { handleSubmit } from "../../utils/handleSubmit";
-import toast from "react-hot-toast";
-import type { Partner, PartnerType } from "../../types/partners";
+import { Button } from "../../components/Button"
+import { handleSubmit } from "../../utils/handleSubmit"
+import toast from "react-hot-toast"
+import type { Partner, PartnerType } from "../../types/partners"
 
 
-interface EditFormProps {
-    editFormOpen: boolean;
-    setEditFormOpen: Dispatch<SetStateAction<boolean>>;
-    formData: Omit<Partner, "id" | "avatar">;
-    selectedPartner: Partner | null;
-    refetch: () => void;
-    resetFormData: () => void;
-    setSelectedPartner: Dispatch<SetStateAction<Partner | null>>;
+interface CreateButtonProps {
+    formData: Omit<Partner, "id">
     handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    resetFormData: () => void;
+    refetch: () => void;
+
 }
 
 const PartnerTypes: PartnerType[] = ["Supplier", "Distributor", "Investor", "Partner"]
 
-const EditForm: FC<EditFormProps> = (
+
+const CreateButton: FC<CreateButtonProps> = (
     {
-        editFormOpen,
-        setEditFormOpen,
         formData,
-        selectedPartner,
-        refetch,
-        resetFormData,
-        setSelectedPartner,
         handleFormDataChange,
+        resetFormData,
+        refetch,
     }
 ) => {
+    const [createFormOpen, setCreateFormOpen] = useState(false);
+    const [isCeateFormSubmitting, setIsCeateFormSubmitting] = useState(false)
 
-    const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
 
-
-    const handleEditFormSubmit = () => {
-        if (!selectedPartner) return;
+    const handleCreateFormSubmit = () => {
         handleSubmit({
-            url: `/partners/${selectedPartner.id}`,
-            method: "PUT",
+            url: "/partners",
+            method: "POST",
             data: formData,
             onSuccess: () => {
-                toast.success("Partner updated successfully");
-                setEditFormOpen(false);
                 resetFormData();
-                setSelectedPartner(null);
-                refetch();
+                toast.success("partner added successfully");
+                setCreateFormOpen(false)
+                refetch()
             },
-            onError: (err) => toast.error(err),
-            setLoading: setIsEditFormSubmitting,
-        });
-    };
+            onError: (err) => { toast.error(err) },
+            setLoading: setIsCeateFormSubmitting
+        })
+    }
 
-
+    useEffect(() => {
+        if (!createFormOpen) {
+            resetFormData()
+        }
+    }, [createFormOpen]);
     return (
-        <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
-            <FormDialog.Body
-                title="Edit Partners"
-                buttonLabel="Update"
-                loading={isEditFormSubmitting}
-                onSubmit={handleEditFormSubmit}
-            >
+        <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
+            <FormDialog.Trigger>
+                <Button>Add Partner</Button>
+            </FormDialog.Trigger>
+            <FormDialog.Body title="Add Partner" buttonLabel="Save" loading={isCeateFormSubmitting} onSubmit={handleCreateFormSubmit}>
                 <FormDialog.TextInput
                     label="Name"
                     name="name"
@@ -98,9 +93,12 @@ const EditForm: FC<EditFormProps> = (
                     type="email"
                     full
                 />
+
+
             </FormDialog.Body>
         </FormDialog>
+
     )
 }
 
-export default EditForm
+export default CreateButton

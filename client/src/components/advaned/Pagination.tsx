@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ActionButtons } from "../../components/ActionButtons"
 import type { FC } from "react";
 import useFilters from "../../hooks/useFilters/useFilters";
-import type { UserFilters } from "../../types/user";
 import { memo } from "react"
 
 interface PaginationProps {
@@ -14,7 +13,7 @@ interface PaginationProps {
 
 const Pagination: FC<PaginationProps> = ({ currentPage, total, limit, totalPages }) => {
 
-    const { setFilters, get } = useFilters<UserFilters>()
+    const { setFilters, get } = useFilters()
     const page = get("page", "number")
 
 
