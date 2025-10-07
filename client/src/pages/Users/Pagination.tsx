@@ -3,6 +3,7 @@ import { ActionButtons } from "../../components/ActionButtons"
 import type { FC } from "react";
 import useFilters from "../../hooks/useFilters/useFilters";
 import type { UserFilters } from "../../types/user";
+import { memo } from "react"
 
 interface PaginationProps {
     limit: number | undefined;
@@ -52,4 +53,4 @@ const Pagination: FC<PaginationProps> = ({ currentPage, total, limit, totalPages
     )
 }
 
-export default Pagination
+export default memo(Pagination)

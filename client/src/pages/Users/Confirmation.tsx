@@ -49,7 +49,7 @@ const Confirmation: FC<ConfirmationProps> = (
             <ConfirmationDialog.Body
                 Icon={TriangleAlert}
                 title="Delete User"
-                description="Are you sure you want to delete this user? this action can not be undone."
+                description={`Are you sure you want to delete ${selectedUser?.fullname}? this action can not be undone.`}
                 buttonLabel="Delete"
                 loading={isUserDeleting}
                 onSubmit={handleDelete}

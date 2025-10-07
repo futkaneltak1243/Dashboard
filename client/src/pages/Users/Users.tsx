@@ -50,8 +50,22 @@ const Users = () => {
     };
 
 
-    if (loading) return <p>Loading users...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen">
+                <p className="text-red-600 text-2xl mb-2">Oops! Something went wrong.</p>
+                <p className="text-gray-600">{error}</p>
+            </div>
+        );
+    }
 
     const users = data?.data
     if (!users) return

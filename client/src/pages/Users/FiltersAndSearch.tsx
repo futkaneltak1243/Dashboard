@@ -1,4 +1,4 @@
-import { useCallback, useState, type ChangeEvent, type FC } from "react"
+import { useCallback, useState, type ChangeEvent, memo } from "react"
 import { FilterBar } from "../../components/Filter"
 import { Searchbar } from "../../components/Searchbar"
 import type { UserFilters, UserRole, UserStatus } from "../../types/user"
@@ -9,10 +9,9 @@ const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'D
 const statusFilters: UserStatus[] = ['active', 'inactive', 'pending']
 
 
-interface FiltersAndSearchProps {
-}
 
-const FiltersAndSearch: FC<FiltersAndSearchProps> = () => {
+
+const FiltersAndSearch = () => {
 
     const { setFilters, get } = useFilters<UserFilters>()
     const status = get("status", "array")
@@ -101,4 +100,4 @@ const FiltersAndSearch: FC<FiltersAndSearchProps> = () => {
     )
 }
 
-export default FiltersAndSearch
+export default memo(FiltersAndSearch)
