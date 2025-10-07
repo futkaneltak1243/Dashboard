@@ -47,6 +47,9 @@ const Users = () => {
         password: "",
 
     })
+    const [editFormOpen, setEditFormOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
     const location = useLocation()
 
     const { data, loading, error, refetch } = useFetch<Data>(location.pathname + location.search)
@@ -61,6 +64,19 @@ const Users = () => {
             password: ""
         });
     }
+
+    const handleEditClick = (user: User) => {
+        setSelectedUser(user);
+        setFormData({
+            fullname: user.fullname,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            password: "", // leave empty unless changing
+        });
+        setEditFormOpen(true);
+    };
 
     useEffect(() => {
         if (!createFormOpen) {
@@ -88,6 +104,26 @@ const Users = () => {
             setLoading: setIsCeateFormSubmitting
         })
     }
+
+    const handleEditFormSubmit = () => {
+        if (!selectedUser) return;
+        console.log(selectedUser.id)
+        handleSubmit({
+            url: `/users/${selectedUser.id}`,
+            method: "PUT",
+            data: formData,
+            onSuccess: () => {
+                toast.success("User updated successfully");
+                setEditFormOpen(false);
+                resetFormData();
+                setSelectedUser(null);
+                refetch();
+            },
+            onError: (err) => toast.error(err),
+            setLoading: setIsEditFormSubmitting,
+        });
+    };
+
 
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
@@ -137,6 +173,60 @@ const Users = () => {
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
             <div className="flex justify-end mt-4">
+                <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
+                    <FormDialog.Body
+                        title="Edit User"
+                        buttonLabel="Update"
+                        loading={isEditFormSubmitting}
+                        onSubmit={handleEditFormSubmit}
+                    >
+                        <FormDialog.TextInput
+                            label="Full Name"
+                            name="fullname"
+                            value={formData["fullname"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Username"
+                            name="username"
+                            value={formData["username"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.TextInput
+                            label="Email"
+                            name="email"
+                            value={formData["email"]}
+                            onChange={handleFormDataChange}
+                            type="email"
+                        />
+
+                        <FormDialog.TextInput
+                            label="Password"
+                            name="password"
+                            value={formData["password"]}
+                            onChange={handleFormDataChange}
+                            type="password"
+                        />
+
+                        <FormDialog.SelectInput
+                            label="Role"
+                            name="role"
+                            options={roleFilters.filter(role => role !== "Super Admin")}
+                            value={formData["role"]}
+                            onChange={handleFormDataChange}
+                        />
+
+                        <FormDialog.SelectInput
+                            options={statusFilters}
+                            name="status"
+                            label="Status"
+                            value={formData["status"]}
+                            onChange={handleFormDataChange}
+                        />
+                    </FormDialog.Body>
+                </FormDialog>
                 <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
                     <FormDialog.Trigger>
                         <Button>Add User</Button>
@@ -295,7 +385,11 @@ const Users = () => {
                                     </Table.Cell>
                                     <Table.Cell centered>
                                         <ActionButtons>
-                                            <ActionButtons.Button Icon={SquarePen} type="icon" />
+                                            <ActionButtons.Button
+                                                Icon={SquarePen}
+                                                type="icon"
+                                                onClick={() => handleEditClick(user)}
+                                            />
                                             <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
                                         </ActionButtons>
                                     </Table.Cell>
