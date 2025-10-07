@@ -38,11 +38,19 @@ interface SelectInputProps extends Omit<React.ComponentProps<"select">, "onChang
     onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
+interface DateInputProps extends Omit<React.ComponentProps<"input">, "onChange" | "type"> {
+    label?: string;
+    value?: string;
+    full?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 const FormDialog: FC<FormDialogProps> & {
     Trigger: FC<TriggerProps>,
     Body: FC<BodyProps>,
     TextInput: FC<TextInputProps>,
     SelectInput: FC<SelectInputProps>,
+    DateInput: FC<DateInputProps>,
 } = ({ children, open, setOpen }) => {
     return <Dialog open={open} setOpen={setOpen}>{children}</Dialog>
 }
@@ -163,9 +171,29 @@ const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, fu
     )
 }
 
+const DateInput: FC<DateInputProps> = ({ label, value, full = false, onChange, ...props }) => {
+    return (
+        <div className={cn("flex items-start flex-col", {
+            "col-span-2": full,
+        })}>
+            {label && <p className="mb-2">{label}</p>}
+            <input
+                type="date"
+                className="h-10 border border-gray-300 rounded-md w-full px-3 text-gray-700 
+                           placeholder:text-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-primary transition-colors duration-150"
+                value={value}
+                onChange={e => onChange?.(e)}
+                {...props}
+            />
+        </div>
+    );
+};
+
 
 FormDialog.Trigger = Trigger
 FormDialog.Body = Body
 FormDialog.TextInput = TextInput
 FormDialog.SelectInput = SelectInput
+FormDialog.DateInput = DateInput
 export default FormDialog

@@ -290,6 +290,110 @@ app.get("/api/partners", (req, res) => {
     });
 });
 
+
+/** 🔹 PARTNERS CRUD API */
+
+// ➤ Create partner
+app.post("/api/partners", (req, res) => {
+    const { name, company, email, type, joined } = req.body;
+
+    if (!name || !company || !email || !type || !joined) {
+        return res.status(400).json({ error: "name, company, email, type, and joined are required." });
+    }
+
+    const sql = `
+        INSERT INTO partners (name, company, email, type, joined)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    const params = [name, company, email, type, joined];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            if (err.message.includes("UNIQUE constraint failed")) {
+                return res.status(409).json({ error: "Email or company already exists." });
+            }
+            return res.status(500).json({ error: err.message });
+        }
+
+        const newPartner = {
+            id: this.lastID,
+            name,
+            company,
+            email,
+            type,
+            joined,
+        };
+
+        res.status(201).json({ message: "Partner created successfully", data: newPartner });
+    });
+});
+
+// ➤ Update partner
+app.put("/api/partners/:id", (req, res) => {
+    const { id } = req.params;
+    const { name, company, email, type, joined } = req.body;
+
+    if (!name || !company || !email || !type || !joined) {
+        return res.status(400).json({ error: "name, company, email, type, and joined are required." });
+    }
+
+    // Check if partner exists
+    db.get("SELECT * FROM partners WHERE id = ?", [id], (err, partner) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!partner) return res.status(404).json({ error: "Partner not found." });
+
+        const sql = `
+            UPDATE partners
+            SET name = ?, company = ?, email = ?, type = ?, joined = ?
+            WHERE id = ?
+        `;
+        const params = [name, company, email, type, joined, id];
+
+        db.run(sql, params, function (err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    return res.status(409).json({ error: "Email or company already exists." });
+                }
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({ error: "Partner not found." });
+            }
+
+            res.status(200).json({
+                message: "Partner updated successfully",
+                data: {
+                    id: Number(id),
+                    name,
+                    company,
+                    email,
+                    type,
+                    joined,
+                },
+            });
+        });
+    });
+});
+
+// ➤ Delete partner
+app.delete("/api/partners/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM partners WHERE id = ?", [id], (err, partner) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!partner) return res.status(404).json({ error: "Partner not found." });
+
+        db.run("DELETE FROM partners WHERE id = ?", [id], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: "Partner not found." });
+
+            res.status(200).json({ message: "Partner deleted successfully", id: Number(id) });
+        });
+    });
+});
+
+
 /** 🔹 EXHIBITIONS API */
 app.get("/api/exhibitions", (req, res) => {
     const { title, status, page = 1, limit = 10 } = req.query;

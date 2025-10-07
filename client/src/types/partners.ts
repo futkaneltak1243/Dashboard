@@ -1,4 +1,4 @@
-type PartnerType = "Supplier" | "Distributor" | "Investor" | "Partner";
+export type PartnerType = "Supplier" | "Distributor" | "Investor" | "Partner";
 
 export type Partner = {
     id: number;

@@ -1,12 +1,13 @@
 
-import useFetch from "../../hooks/useFetch/useFetch"
-import type { User } from "../../types/user"
-import { useLocation } from "react-router-dom"
-import UsersTable from "./UsersTable"
-import CreateButton from "./CreateButton"
-import FiltersAndSearch from "./FiltersAndSearch"
-import { Pagination } from "../../components/advaned"
-import { useState } from "react"
+import { useLocation } from "react-router-dom";
+import useFetch from "../../hooks/useFetch/useFetch";
+import type { Partner } from "../../types/partners"
+import { useState } from "react";
+import PartnersTable from "./PartnersTable";
+import CreateButton from "./CreateButton";
+import { Pagination } from "../../components/advaned";
+import Search from "./Search";
+
 
 
 interface Data {
@@ -15,32 +16,31 @@ interface Data {
     total: number;
     totalPages: number;
     count: number;
-    data: User[];
+    data: Partner[];
 }
 
+const Partners = () => {
 
-const Users = () => {
 
-    const [formData, setFormData] = useState<Omit<User, "id" | "avatar">>({
-        fullname: "",
-        username: "",
+    const location = useLocation()
+    const { data, error, loading, refetch } = useFetch<Data>(location.pathname + location.search)
+
+    const [formData, setFormData] = useState<Omit<Partner, "id">>({
+        name: "",
+        company: "",
         email: "",
-        role: "Admin",
-        status: "active",
-        password: "",
+        type: "Investor",
+        joined: "",
 
     })
 
-    const location = useLocation()
-    const { data, loading, error, refetch } = useFetch<Data>(location.pathname + location.search)
     const resetFormData = () => {
         setFormData({
-            fullname: "",
-            username: "",
+            name: "",
+            company: "",
             email: "",
-            role: "Admin",
-            status: "active",
-            password: ""
+            type: "Investor",
+            joined: "",
         });
     }
 
@@ -67,13 +67,14 @@ const Users = () => {
         );
     }
 
-    const users = data?.data
-    if (!users) return
+    if (!data) return null;
+
+
+    const partners = data.data
     return (
         <div className="p-[15px] md:p-[30px]">
-            <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
+            <h1 className="text-text-light dark:text-text-dark text-3xl">Partners</h1>
             <div className="flex justify-end mt-4">
-
                 <CreateButton
                     formData={formData}
                     handleFormDataChange={handleFormDataChange}
@@ -81,27 +82,28 @@ const Users = () => {
                     refetch={refetch}
                 />
             </div>
-
-            <FiltersAndSearch />
+            <div className="mt-4 flex justify-start">
+                <Search />
+            </div>
             <div className="mt-4">
-                <UsersTable
-                    users={users}
+                <PartnersTable
+                    partners={partners}
                     formData={formData}
                     setFormData={setFormData}
                     refetch={refetch}
                     handleFormDataChange={handleFormDataChange}
                 />
                 <Pagination
-                    limit={data.limit}
                     total={data.total}
-                    totalPages={data.totalPages}
                     currentPage={data.page}
+                    totalPages={data.totalPages}
+                    limit={data.limit}
+
                 />
 
             </div>
-
         </div>
     )
 }
 
-export default Users
+export default Partners
