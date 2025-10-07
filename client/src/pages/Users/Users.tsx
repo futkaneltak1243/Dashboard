@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom"
 import UsersTable from "./UsersTable"
 import CreateButton from "./CreateButton"
 import FiltersAndSearch from "./FiltersAndSearch"
-import Pagination from "./Pagination"
+import { Pagination } from "../../components/advaned"
 import { useState } from "react"
 
 
