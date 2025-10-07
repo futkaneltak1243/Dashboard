@@ -69,7 +69,7 @@ const Body: FC<BodyProps> = ({ className, title, Icon, iconClass, description, l
                 </Dialog.Close>
                 <button
                     className={cn(
-                        "h-9 w-21 rounded-md flex items-center justify-center transition-colors duration-150 bg-red-700 text-white hover:bg-red-800 cursor-pointer",
+                        "h-9 w-21 rounded-md flex items-center justify-center transition-colors duration-150 bg-red-600 text-white hover:bg-red-700 cursor-pointer",
                         buttonClass,
                         {
                             "bg-gray-300 text-gray-500 cursor-not-allowed ": loading

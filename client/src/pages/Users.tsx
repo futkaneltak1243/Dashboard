@@ -4,7 +4,7 @@ import { FilterBar } from "../components/Filter"
 import { Table } from "../components/Table"
 import { Searchbar } from "../components/Searchbar"
 import { ActionButtons } from "../components/ActionButtons"
-import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, SquarePen, Trash2, TriangleAlert } from "lucide-react"
 import { cn } from "../components/classNames"
 import useFetch from "../hooks/useFetch/useFetch"
 import type { UserRole, UserStatus, User, UserFilters } from "../types/user"
@@ -13,6 +13,7 @@ import useFilters from "../hooks/useFilters/useFilters"
 import { FormDialog } from "../components/FormDialog"
 import { handleSubmit } from "../utils/handleSubmit"
 import toast from "react-hot-toast"
+import ConfirmationDialog from "../components/ConfirmationDialog/ConfirmationDialog"
 
 
 interface Data {
@@ -50,6 +51,10 @@ const Users = () => {
     const [editFormOpen, setEditFormOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
+
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
+    const [isUserDeleting, setIsUserDeleting] = useState(false)
+
     const location = useLocation()
 
     const { data, loading, error, refetch } = useFetch<Data>(location.pathname + location.search)
@@ -77,6 +82,11 @@ const Users = () => {
         });
         setEditFormOpen(true);
     };
+
+    const handleDeleteClick = (user: User) => {
+        setSelectedUser(user);
+        setConfirmationOpen(true)
+    }
 
     useEffect(() => {
         if (!createFormOpen) {
@@ -107,7 +117,6 @@ const Users = () => {
 
     const handleEditFormSubmit = () => {
         if (!selectedUser) return;
-        console.log(selectedUser.id)
         handleSubmit({
             url: `/users/${selectedUser.id}`,
             method: "PUT",
@@ -125,6 +134,24 @@ const Users = () => {
     };
 
 
+    const handleDelete = () => {
+        if (!selectedUser) return;
+
+        handleSubmit({
+            url: `/users/${selectedUser.id}`,
+            method: "DELETE",
+            onSuccess: () => {
+                toast.success("User deleted successfully");
+                setSelectedUser(null);
+                setConfirmationOpen(false);
+                refetch();
+            },
+            onError: (err) => {
+                toast.error(err);
+            },
+            setLoading: setIsUserDeleting, // optional: if you have a delete loading state
+        });
+    };
 
     const handleRoleFilterSelect = useCallback((filter: UserRole) => {
         setSelectedRoleFilteres((prev: UserRole[]) => {
@@ -173,6 +200,17 @@ const Users = () => {
         <div className="p-[15px] md:p-[30px]">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Users</h1>
             <div className="flex justify-end mt-4">
+                <ConfirmationDialog open={confirmationOpen} setOpen={setConfirmationOpen}>
+                    <ConfirmationDialog.Body
+                        Icon={TriangleAlert}
+                        title="Delete User"
+                        description="Are you sure you want to delete this user? this action can not be undone."
+                        buttonLabel="Delete"
+                        loading={isUserDeleting}
+                        onSubmit={handleDelete}
+                        iconClass="text-red-600 w-9 h-9"
+                    />
+                </ConfirmationDialog>
                 <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
                     <FormDialog.Body
                         title="Edit User"
@@ -390,7 +428,12 @@ const Users = () => {
                                                 type="icon"
                                                 onClick={() => handleEditClick(user)}
                                             />
-                                            <ActionButtons.Button Icon={Trash2} type="icon" iconClass="text-red-600 dark:text-red-400" />
+                                            <ActionButtons.Button
+                                                Icon={Trash2}
+                                                type="icon"
+                                                iconClass="text-red-600 dark:text-red-400"
+                                                onClick={() => handleDeleteClick(user)}
+                                            />
                                         </ActionButtons>
                                     </Table.Cell>
                                 </Table.Row>
