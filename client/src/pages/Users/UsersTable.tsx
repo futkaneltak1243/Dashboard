@@ -14,7 +14,7 @@ interface UsersTableProps {
     formData: Omit<User, "id" | "avatar">;
     setFormData: Dispatch<SetStateAction<Omit<User, "id" | "avatar">>>;
     refetch: () => void;
-    handleFormDataChange: () => void;
+    handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
 

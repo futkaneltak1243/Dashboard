@@ -1,67 +1,56 @@
-import { useState, type Dispatch, type FC, type SetStateAction } from "react";
+import { useState, type FC } from "react"
 import { FormDialog } from "../../components/FormDialog"
-import type { User, UserRole, UserStatus } from "../../types/user";
-import { handleSubmit } from "../../utils/handleSubmit";
-import toast from "react-hot-toast";
+import { Button } from "../../components/Button"
+import type { User, UserRole, UserStatus } from "../../types/user"
+import { handleSubmit } from "../../utils/handleSubmit"
+import toast from "react-hot-toast"
 
 
-interface EditFormProps {
-    editFormOpen: boolean;
-    setEditFormOpen: Dispatch<SetStateAction<boolean>>;
-    formData: Omit<User, "id" | "avatar">;
-    selectedUser: User | null;
-    refetch: () => void;
-    resetFormData: () => void;
-    setSelectedUser: Dispatch<SetStateAction<User | null>>;
+interface CreateButtonProps {
+    formData: Omit<User, "id" | "avatar">
     handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    resetFormData: () => void;
+    refetch: () => void;
+
 }
 
 const UserRole: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
 const UserStatus: UserStatus[] = ['active', 'inactive', 'pending']
 
-const EditForm: FC<EditFormProps> = (
+const CreateButton: FC<CreateButtonProps> = (
     {
-        editFormOpen,
-        setEditFormOpen,
         formData,
-        selectedUser,
-        refetch,
-        resetFormData,
-        setSelectedUser,
         handleFormDataChange,
+        resetFormData,
+        refetch,
     }
 ) => {
+    const [createFormOpen, setCreateFormOpen] = useState(false);
+    const [isCeateFormSubmitting, setIsCeateFormSubmitting] = useState(false)
 
-    const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
 
-
-    const handleEditFormSubmit = () => {
-        if (!selectedUser) return;
+    const handleCreateFormSubmit = () => {
         handleSubmit({
-            url: `/users/${selectedUser.id}`,
-            method: "PUT",
+            url: "/users",
+            method: "POST",
             data: formData,
             onSuccess: () => {
-                toast.success("User updated successfully");
-                setEditFormOpen(false);
                 resetFormData();
-                setSelectedUser(null);
-                refetch();
+                toast.success("user added successfully");
+                setCreateFormOpen(false)
+                refetch()
             },
-            onError: (err) => toast.error(err),
-            setLoading: setIsEditFormSubmitting,
-        });
-    };
-
+            onError: (err) => { toast.error(err) },
+            setLoading: setIsCeateFormSubmitting
+        })
+    }
 
     return (
-        <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
-            <FormDialog.Body
-                title="Edit User"
-                buttonLabel="Update"
-                loading={isEditFormSubmitting}
-                onSubmit={handleEditFormSubmit}
-            >
+        <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
+            <FormDialog.Trigger>
+                <Button>Add User</Button>
+            </FormDialog.Trigger>
+            <FormDialog.Body title="Add User" buttonLabel="Save" loading={isCeateFormSubmitting} onSubmit={handleCreateFormSubmit}>
                 <FormDialog.TextInput
                     label="Full Name"
                     name="fullname"
@@ -107,9 +96,12 @@ const EditForm: FC<EditFormProps> = (
                     value={formData["status"]}
                     onChange={handleFormDataChange}
                 />
+
+
             </FormDialog.Body>
         </FormDialog>
+
     )
 }
 
-export default EditForm
+export default CreateButton
