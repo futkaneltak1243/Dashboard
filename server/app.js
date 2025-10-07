@@ -169,6 +169,28 @@ app.put("/api/users/:id", async (req, res) => {
     }
 });
 
+app.delete("/api/users/:id", (req, res) => {
+    const { id } = req.params;
+
+    // First, check if the user exists and their role
+    db.get("SELECT role FROM users WHERE id = ?", [id], (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!user) return res.status(404).json({ error: "User not found." });
+
+        // Prevent deleting Super Admin
+        if (user.role === "Super Admin") {
+            return res.status(400).json({ error: "You cannot delete a Super Admin." });
+        }
+
+        // Proceed to delete
+        db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: "User not found." });
+
+            res.status(200).json({ message: "User deleted successfully", id: Number(id) });
+        });
+    });
+});
 
 /** 🔹 PARTNERS API */
 app.get("/api/partners", (req, res) => {
