@@ -1,4 +1,4 @@
-import { useState, type FC } from "react"
+import { useEffect, useState, type FC } from "react"
 import { FormDialog } from "../../components/FormDialog"
 import { Button } from "../../components/Button"
 import type { User, UserRole, UserStatus } from "../../types/user"
@@ -45,6 +45,11 @@ const CreateButton: FC<CreateButtonProps> = (
         })
     }
 
+    useEffect(() => {
+        if (!createFormOpen) {
+            resetFormData()
+        }
+    }, [createFormOpen]);
     return (
         <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
             <FormDialog.Trigger>
