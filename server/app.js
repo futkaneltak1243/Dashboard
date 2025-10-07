@@ -192,6 +192,60 @@ app.delete("/api/users/:id", (req, res) => {
     });
 });
 
+/** 🔹 PRODUCTS API */
+app.get("/api/products", (req, res) => {
+    const { name, isfavorite, page = 1, limit = 10 } = req.query;
+    const filters = [];
+    const params = [];
+
+    // Search by name
+    if (name) {
+        filters.push(`name LIKE ?`);
+        params.push(`%${name}%`);
+    }
+
+    // Filter by favorite (expects 0 or 1)
+    if (isfavorite !== undefined) {
+        filters.push(`isfavorite = ?`);
+        params.push(Number(isfavorite));
+    }
+
+    const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const baseSql = `FROM products ${whereClause}`;
+    const sql = `SELECT * ${baseSql} LIMIT ? OFFSET ?`;
+    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
+    const finalParams = [...params, parseInt(limit), offset];
+
+    // First, count total items
+    db.get(countSql, params, (err, countResult) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Then, fetch paginated data
+        db.all(sql, finalParams, (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            // Parse images JSON
+            const data = rows.map(row => ({
+                ...row,
+                images: JSON.parse(row.images)
+            }));
+
+            const total = countResult.total;
+            res.status(200).json({
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / limit),
+                count: data.length,
+                data
+            });
+        });
+    });
+});
+
+
 /** 🔹 PARTNERS API */
 app.get("/api/partners", (req, res) => {
     const { name, type, page = 1, limit = 10 } = req.query;
