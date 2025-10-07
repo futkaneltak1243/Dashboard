@@ -61,7 +61,6 @@ app.get("/api/users", (req, res) => {
 
 
 
-// Make sure your table has a `password` column (TEXT)
 app.post("/api/users", async (req, res) => {
     const { fullname, username, email, role, status, avatar = null, password } = req.body;
 
@@ -103,6 +102,60 @@ app.post("/api/users", async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ error: "Failed to hash password." });
+    }
+});
+
+app.put("/api/users/:id", async (req, res) => {
+    const { id } = req.params;
+    const { fullname, username, email, role, status, avatar = null, password } = req.body;
+
+    // Validate input
+    if (!fullname || !username || !email || !role || !status) {
+        return res.status(400).json({ error: "fullname, username, email, role, and status are required." });
+    }
+
+    try {
+        const fields = ["fullname", "username", "email", "role", "status", "avatar"];
+        const params = [fullname, username, email, role, status, avatar];
+
+        // Handle password if provided
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            fields.push("password");
+            params.push(hashedPassword);
+        }
+
+        const setClause = fields.map(field => `${field} = ?`).join(", ");
+        const sql = `UPDATE users SET ${setClause} WHERE id = ?`;
+        params.push(id);
+
+        db.run(sql, params, function (err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    return res.status(409).json({ error: "Username or email already exists." });
+                }
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({ error: "User not found." });
+            }
+
+            res.status(200).json({
+                message: "User updated successfully",
+                data: {
+                    id: Number(id),
+                    fullname,
+                    username,
+                    email,
+                    role,
+                    status,
+                    avatar
+                },
+            });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update user." });
     }
 });
 
