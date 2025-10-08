@@ -438,19 +438,20 @@ app.get("/api/exhibitions", (req, res) => {
     });
 });
 
+
 /** 🔹 CREATE EXHIBITION */
 app.post("/api/exhibitions", (req, res) => {
-    const { name, title, location, organizer, dates, capacity, status } = req.body;
+    const { name, title, location, organizer, start_date, end_date, capacity, status } = req.body;
 
-    if (!name || !title || !location || !organizer || !dates || !capacity || !status) {
+    if (!name || !title || !location || !organizer || !start_date || !end_date || !capacity || !status) {
         return res.status(400).json({ error: "All fields are required." });
     }
 
     const sql = `
-        INSERT INTO exhibitions (name, title, location, organizer, dates, capacity, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO exhibitions (name, title, location, organizer, start_date, end_date, capacity, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const params = [name, title, location, organizer, dates, capacity, status];
+    const params = [name, title, location, organizer, start_date, end_date, capacity, status];
 
     db.run(sql, params, function (err) {
         if (err) return res.status(500).json({ error: err.message });
@@ -461,7 +462,8 @@ app.post("/api/exhibitions", (req, res) => {
             title,
             location,
             organizer,
-            dates,
+            start_date,
+            end_date,
             capacity,
             status
         };
@@ -471,12 +473,13 @@ app.post("/api/exhibitions", (req, res) => {
 });
 
 
+
 /** 🔹 UPDATE EXHIBITION */
 app.put("/api/exhibitions/:id", (req, res) => {
     const { id } = req.params;
-    const { name, title, location, organizer, dates, capacity, status } = req.body;
+    const { name, title, location, organizer, start_date, end_date, capacity, status } = req.body;
 
-    if (!name || !title || !location || !organizer || !dates || !capacity || !status) {
+    if (!name || !title || !location || !organizer || !start_date || !end_date || !capacity || !status) {
         return res.status(400).json({ error: "All fields are required." });
     }
 
@@ -485,11 +488,11 @@ app.put("/api/exhibitions/:id", (req, res) => {
         if (!exhibition) return res.status(404).json({ error: "Exhibition not found." });
 
         const sql = `
-            UPDATE exhibitions
-            SET name = ?, title = ?, location = ?, organizer = ?, dates = ?, capacity = ?, status = ?
-            WHERE id = ?
-        `;
-        const params = [name, title, location, organizer, dates, capacity, status, id];
+        UPDATE exhibitions
+        SET name = ?, title = ?, location = ?, organizer = ?, start_date = ?, end_date = ?, capacity = ?, status = ?
+        WHERE id = ?
+      `;
+        const params = [name, title, location, organizer, start_date, end_date, capacity, status, id];
 
         db.run(sql, params, function (err) {
             if (err) return res.status(500).json({ error: err.message });
@@ -497,16 +500,7 @@ app.put("/api/exhibitions/:id", (req, res) => {
 
             res.status(200).json({
                 message: "Exhibition updated successfully",
-                data: {
-                    id: Number(id),
-                    name,
-                    title,
-                    location,
-                    organizer,
-                    dates,
-                    capacity,
-                    status
-                }
+                data: { id: Number(id), name, title, location, organizer, start_date, end_date, capacity, status }
             });
         });
     });

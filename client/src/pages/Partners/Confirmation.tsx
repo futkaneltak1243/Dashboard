@@ -48,7 +48,7 @@ const Confirmation: FC<ConfirmationProps> = (
         <ConfirmationDialog open={confirmationOpen} setOpen={setConfirmationOpen}>
             <ConfirmationDialog.Body
                 Icon={TriangleAlert}
-                title="Delete User"
+                title="Delete Partner"
                 description={`Are you sure you want to delete ${selectedPartner?.name}? this action can not be undone.`}
                 buttonLabel="Delete"
                 loading={isPartnerDeleting}
