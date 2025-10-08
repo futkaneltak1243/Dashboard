@@ -67,11 +67,13 @@ db.serialize(() => {
       title TEXT NOT NULL,
       location TEXT NOT NULL,
       organizer TEXT NOT NULL,
-      dates TEXT NOT NULL, -- could be a range stored as string
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL,
       capacity INTEGER NOT NULL,
       status TEXT NOT NULL
     );
   `);
+
 
   // Orders table
   db.run(`

@@ -110,22 +110,27 @@ db.serialize(() => {
     // EXHIBITIONS
     const exhibitionStatuses = ["Upcoming", "Ongoing", "Completed", "Planned"];
     const insertExhibition = db.prepare(`
-    INSERT INTO exhibitions (name, title, location, organizer, dates, capacity, status) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `);
+      INSERT INTO exhibitions (name, title, location, organizer, start_date, end_date, capacity, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
 
-    const runExhibition = (name, title, location, organizer, dates, capacity, status) => {
-        insertExhibition.run([name, title, location, organizer, dates, capacity, status], (err) => {
+    const runExhibition = (name, title, location, organizer, startDate, endDate, capacity, status) => {
+        insertExhibition.run([name, title, location, organizer, startDate, endDate, capacity, status], (err) => {
             if (err) console.error(chalk.red("Failed to insert exhibition:"), err.message);
         });
     };
 
     for (let i = 0; i < 20; i++) {
+        const startDate = faker.date.future();
+        const endDate = faker.date.between({ from: startDate, to: new Date(startDate.getFullYear(), startDate.getMonth() + 2) });
+
         runExhibition(
             faker.company.name(),
             faker.commerce.productAdjective() + " Expo",
             faker.location.city(),
             faker.company.name(),
-            faker.date.future().toISOString().split("T")[0],
+            startDate.toISOString().split("T")[0],
+            endDate.toISOString().split("T")[0],
             faker.number.int({ min: 50, max: 1000 }),
             faker.helpers.arrayElement(exhibitionStatuses)
         );
@@ -135,6 +140,7 @@ db.serialize(() => {
         if (err) console.error(chalk.red("Error finalizing exhibitions insert:"), err.message);
         else console.log(chalk.green("Exhibitions seeded."));
     });
+
 
     // ORDERS
     const orderStatuses = ["Completed", "Processing", "Rejected", "On Hold", "In Transit"];

@@ -3,13 +3,13 @@ import ConfirmationDialog from "../../components/ConfirmationDialog/Confirmation
 import { useState, type Dispatch, type FC, type SetStateAction } from "react"
 import { handleSubmit } from "../../utils/handleSubmit";
 import toast from "react-hot-toast";
-import type { Partner } from "../../types/partners";
+import type { Exhibition } from "../../types/exhibitions";
 
 interface ConfirmationProps {
     confirmationOpen: boolean;
     setConfirmationOpen: Dispatch<SetStateAction<boolean>>;
-    selectedPartner: Partner | null;
-    setSelectedPartner: Dispatch<SetStateAction<Partner | null>>;
+    selectedExhibition: Exhibition | null;
+    setSelectedExhibition: Dispatch<SetStateAction<Exhibition | null>>;
     refetch: () => void;
 }
 
@@ -18,29 +18,29 @@ const Confirmation: FC<ConfirmationProps> = (
     {
         confirmationOpen,
         setConfirmationOpen,
-        selectedPartner,
-        setSelectedPartner,
+        selectedExhibition,
+        setSelectedExhibition,
         refetch,
     }
 ) => {
-    const [isPartnerDeleting, setIsPartnerDeleting] = useState(false)
+    const [isExhibitionDeleting, setIsExhibitionDeleting] = useState(false)
 
     const handleDelete = () => {
-        if (!selectedPartner) return;
+        if (!selectedExhibition) return;
 
         handleSubmit({
-            url: `/partners/${selectedPartner.id}`,
+            url: `/exhibitions/${selectedExhibition.id}`,
             method: "DELETE",
             onSuccess: () => {
-                toast.success("Partner deleted successfully");
-                setSelectedPartner(null);
+                toast.success("Exhibition deleted successfully");
+                setSelectedExhibition(null);
                 setConfirmationOpen(false);
                 refetch();
             },
             onError: (err) => {
                 toast.error(err);
             },
-            setLoading: setIsPartnerDeleting, // optional: if you have a delete loading state
+            setLoading: setIsExhibitionDeleting,
         });
     };
 
@@ -48,10 +48,10 @@ const Confirmation: FC<ConfirmationProps> = (
         <ConfirmationDialog open={confirmationOpen} setOpen={setConfirmationOpen}>
             <ConfirmationDialog.Body
                 Icon={TriangleAlert}
-                title="Delete Partner"
-                description={`Are you sure you want to delete ${selectedPartner?.name}? this action can not be undone.`}
+                title="Delete Exhibition"
+                description={`Are you sure you want to delete ${selectedExhibition?.name}? this action can not be undone.`}
                 buttonLabel="Delete"
-                loading={isPartnerDeleting}
+                loading={isExhibitionDeleting}
                 onSubmit={handleDelete}
                 iconClass="text-red-600 w-9 h-9"
             />

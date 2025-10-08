@@ -8,7 +8,7 @@ import type { Partner, PartnerType } from "../../types/partners";
 interface EditFormProps {
     editFormOpen: boolean;
     setEditFormOpen: Dispatch<SetStateAction<boolean>>;
-    formData: Omit<Partner, "id" | "avatar">;
+    formData: Omit<Partner, "id">;
     selectedPartner: Partner | null;
     refetch: () => void;
     resetFormData: () => void;
@@ -56,7 +56,7 @@ const EditForm: FC<EditFormProps> = (
     return (
         <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
             <FormDialog.Body
-                title="Edit Partners"
+                title="Edit Partner"
                 buttonLabel="Update"
                 loading={isEditFormSubmitting}
                 onSubmit={handleEditFormSubmit}

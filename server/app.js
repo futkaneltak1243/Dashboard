@@ -438,6 +438,93 @@ app.get("/api/exhibitions", (req, res) => {
     });
 });
 
+
+/** 🔹 CREATE EXHIBITION */
+app.post("/api/exhibitions", (req, res) => {
+    const { name, title, location, organizer, start_date, end_date, capacity, status } = req.body;
+
+    if (!name || !title || !location || !organizer || !start_date || !end_date || !capacity || !status) {
+        return res.status(400).json({ error: "All fields are required." });
+    }
+
+    const sql = `
+      INSERT INTO exhibitions (name, title, location, organizer, start_date, end_date, capacity, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const params = [name, title, location, organizer, start_date, end_date, capacity, status];
+
+    db.run(sql, params, function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const newExhibition = {
+            id: this.lastID,
+            name,
+            title,
+            location,
+            organizer,
+            start_date,
+            end_date,
+            capacity,
+            status
+        };
+
+        res.status(201).json({ message: "Exhibition created successfully", data: newExhibition });
+    });
+});
+
+
+
+/** 🔹 UPDATE EXHIBITION */
+app.put("/api/exhibitions/:id", (req, res) => {
+    const { id } = req.params;
+    const { name, title, location, organizer, start_date, end_date, capacity, status } = req.body;
+
+    if (!name || !title || !location || !organizer || !start_date || !end_date || !capacity || !status) {
+        return res.status(400).json({ error: "All fields are required." });
+    }
+
+    db.get("SELECT * FROM exhibitions WHERE id = ?", [id], (err, exhibition) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!exhibition) return res.status(404).json({ error: "Exhibition not found." });
+
+        const sql = `
+        UPDATE exhibitions
+        SET name = ?, title = ?, location = ?, organizer = ?, start_date = ?, end_date = ?, capacity = ?, status = ?
+        WHERE id = ?
+      `;
+        const params = [name, title, location, organizer, start_date, end_date, capacity, status, id];
+
+        db.run(sql, params, function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: "Exhibition not found." });
+
+            res.status(200).json({
+                message: "Exhibition updated successfully",
+                data: { id: Number(id), name, title, location, organizer, start_date, end_date, capacity, status }
+            });
+        });
+    });
+});
+
+
+/** 🔹 DELETE EXHIBITION */
+app.delete("/api/exhibitions/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM exhibitions WHERE id = ?", [id], (err, exhibition) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!exhibition) return res.status(404).json({ error: "Exhibition not found." });
+
+        db.run("DELETE FROM exhibitions WHERE id = ?", [id], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: "Exhibition not found." });
+
+            res.status(200).json({ message: "Exhibition deleted successfully", id: Number(id) });
+        });
+    });
+});
+
+
 /** 🔹 ORDERS API */
 app.get("/api/orders", (req, res) => {
     const { date, status, page = 1, limit = 10 } = req.query;
