@@ -1,13 +1,14 @@
 import { ActionButtons } from "../../components/ActionButtons"
 import { Button } from "../../components/Button"
-import { Searchbar } from "../../components/Searchbar"
+
 import { Table } from "../../components/Table"
-import { ChevronLeft, ChevronRight, MapPin, SquarePen, Trash2 } from "lucide-react"
-import type { Exhibition, ExhibitionFilters } from "../../types/exhibitions"
-import { useCallback, useState, type ChangeEvent } from "react"
-import useFilters from "../../hooks/useFilters/useFilters"
+import { MapPin, SquarePen, Trash2 } from "lucide-react"
+import type { Exhibition } from "../../types/exhibitions"
+
 import useFetch from "../../hooks/useFetch/useFetch"
 import { useLocation } from "react-router-dom"
+import { Pagination } from "../../components/advaned"
+import Search from "./Search"
 
 
 
@@ -23,14 +24,7 @@ interface Data {
 const Exhibitions = () => {
     const location = useLocation()
     const { data, error, loading } = useFetch<Data>(location.pathname + location.search)
-    const { get, setFilters } = useFilters<ExhibitionFilters>()
-    const initialTitle = get("title", "string")
-    const page = get("page", "number")
-    const [title, setTitle] = useState<string>(initialTitle ? initialTitle : "")
 
-    const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value)
-    }, [])
 
     if (loading) {
         return (
@@ -51,11 +45,6 @@ const Exhibitions = () => {
 
     if (!data) return null;
 
-    const handlePageChange = (p: number) => {
-        if (p < 1) return
-        if (p > data?.totalPages) return
-        setFilters({ page: p })
-    }
 
     const exhibitions = data.data
     return (
@@ -65,14 +54,7 @@ const Exhibitions = () => {
                 <Button>Add Exhibition</Button>
             </div>
             <div className="mt-4 flex justify-start">
-                <Searchbar
-                    color="default"
-                    size="sm"
-                    placeholder="Search Exhibitions..."
-                    onChange={handleSearchInputChange}
-                    buttonClick={() => setFilters({ title: title })}
-                    value={title}
-                />
+                <Search />
             </div>
             <div className="mt-4">
 
@@ -152,26 +134,12 @@ const Exhibitions = () => {
                 </Table>
             </div>
 
-            <div className="flex justify-between mt-[20px]">
-                <p className="text-sm text-midgray">
-                    showing {data.total ? 1 + data.limit * (data.page - 1) : 0}-{Math.min(data.limit * data.page, data.total)} of {data.total}
-                </p>
-                <ActionButtons>
-                    <ActionButtons.Button
-                        type="icon"
-                        Icon={ChevronLeft}
-                        onClick={() => handlePageChange(page ? page - 1 : 1)}
-                        disabled={page === 1}
-                    />
-                    <ActionButtons.Button
-                        type="icon"
-                        Icon={ChevronRight}
-                        onClick={() =>
-                            handlePageChange(page ? page + 1 : 1)}
-                        disabled={page === data.totalPages}
-                    />
-                </ActionButtons>
-            </div>
+            <Pagination
+                limit={data.limit}
+                total={data.total}
+                totalPages={data.totalPages}
+                currentPage={data.page}
+            />
 
         </div>
 
