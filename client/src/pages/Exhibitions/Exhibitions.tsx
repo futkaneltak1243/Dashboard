@@ -28,7 +28,8 @@ const Exhibitions = () => {
         title: "",
         location: "",
         organizer: "",
-        dates: "",
+        start_date: "",
+        end_date: "",
         status: "Planned",
         capacity: 0,
 
@@ -47,7 +48,8 @@ const Exhibitions = () => {
             title: "",
             location: "",
             organizer: "",
-            dates: "",
+            start_date: "",
+            end_date: "",
             status: "Planned",
             capacity: 0,
         });

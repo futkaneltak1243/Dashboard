@@ -34,7 +34,8 @@ const ExhibitionTable: FC<ExhibitionTableProps> = ({ exhibitions, formData, setF
             title: exhibition.title,
             location: exhibition.location,
             organizer: exhibition.organizer,
-            dates: exhibition.dates,
+            start_date: exhibition.start_date,
+            end_date: exhibition.end_date,
             status: exhibition.status,
             capacity: exhibition.capacity,
         });
@@ -113,7 +114,7 @@ const ExhibitionTable: FC<ExhibitionTableProps> = ({ exhibitions, formData, setF
                                     {exhibition.organizer}
                                 </Table.Cell>
                                 <Table.Cell>
-                                    {exhibition.dates}
+                                    {`${exhibition.start_date}/${exhibition.end_date}`}
                                 </Table.Cell>
                                 <Table.Cell>
                                     {exhibition.capacity}

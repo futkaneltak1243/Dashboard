@@ -6,7 +6,8 @@ export type Exhibition = {
     title: string;
     location: string;
     organizer: string;
-    dates: string;
+    start_date: string;
+    end_date: string;
     status: ExhibitionStatus;
     capacity: number;
 }

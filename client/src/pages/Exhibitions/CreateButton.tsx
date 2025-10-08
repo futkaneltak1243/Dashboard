@@ -74,6 +74,21 @@ const CreateButton: FC<CreateButtonProps> = (
                     onChange={handleFormDataChange}
                 />
 
+
+                <FormDialog.DateInput
+                    label="Start Date"
+                    name="start_date"
+                    value={formData["start_date"]}
+                    onChange={handleFormDataChange}
+                />
+
+                <FormDialog.DateInput
+                    label="End Date"
+                    name="end_date"
+                    value={formData["end_date"]}
+                    onChange={handleFormDataChange}
+                />
+
                 <FormDialog.TextInput
                     label="Organizer"
                     name="organizer"
@@ -82,12 +97,6 @@ const CreateButton: FC<CreateButtonProps> = (
                 />
 
 
-                <FormDialog.DateInput
-                    label="Dates"
-                    name="dates"
-                    value={formData["dates"]}
-                    onChange={handleFormDataChange}
-                />
 
                 <FormDialog.TextInput
                     label="Capacity"
@@ -110,7 +119,6 @@ const CreateButton: FC<CreateButtonProps> = (
                     name="location"
                     value={String(formData["location"])}
                     onChange={handleFormDataChange}
-                    full
                 />
             </FormDialog.Body>
         </FormDialog>
