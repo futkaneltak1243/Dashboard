@@ -1,3 +1,5 @@
+export type ExhibitionStatus = "Upcoming" | "Ongoing" | "Completed" | "Planned"
+
 export type Exhibition = {
     id: number;
     name: string;
@@ -5,7 +7,7 @@ export type Exhibition = {
     location: string;
     organizer: string;
     dates: string;
-    status: "Upcoming" | "Ongoing" | "Completed" | "Planned";
+    status: ExhibitionStatus;
     capacity: number;
 }
 

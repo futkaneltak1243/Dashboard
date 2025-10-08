@@ -2,31 +2,31 @@ import { useState, type Dispatch, type FC, type SetStateAction } from "react";
 import { FormDialog } from "../../components/FormDialog"
 import { handleSubmit } from "../../utils/handleSubmit";
 import toast from "react-hot-toast";
-import type { Partner, PartnerType } from "../../types/partners";
+import type { Exhibition, ExhibitionStatus } from "../../types/exhibitions";
 
 
 interface EditFormProps {
     editFormOpen: boolean;
     setEditFormOpen: Dispatch<SetStateAction<boolean>>;
-    formData: Omit<Partner, "id">;
-    selectedPartner: Partner | null;
+    formData: Omit<Exhibition, "id">;
+    selectedExhibition: Exhibition | null;
     refetch: () => void;
     resetFormData: () => void;
-    setSelectedPartner: Dispatch<SetStateAction<Partner | null>>;
+    setSelectedExhibition: Dispatch<SetStateAction<Exhibition | null>>;
     handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
-const PartnerTypes: PartnerType[] = ["Supplier", "Distributor", "Investor", "Partner"]
+const exhibitionStatuses: ExhibitionStatus[] = ["Upcoming", "Ongoing", "Completed", "Planned"]
 
 const EditForm: FC<EditFormProps> = (
     {
         editFormOpen,
         setEditFormOpen,
         formData,
-        selectedPartner,
+        selectedExhibition,
         refetch,
         resetFormData,
-        setSelectedPartner,
+        setSelectedExhibition,
         handleFormDataChange,
     }
 ) => {
@@ -35,16 +35,16 @@ const EditForm: FC<EditFormProps> = (
 
 
     const handleEditFormSubmit = () => {
-        if (!selectedPartner) return;
+        if (!selectedExhibition) return;
         handleSubmit({
-            url: `/partners/${selectedPartner.id}`,
+            url: `/exhibitions/${selectedExhibition.id}`,
             method: "PUT",
             data: formData,
             onSuccess: () => {
-                toast.success("Partner updated successfully");
+                toast.success("Exhibition updated successfully");
                 setEditFormOpen(false);
                 resetFormData();
-                setSelectedPartner(null);
+                setSelectedExhibition(null);
                 refetch();
             },
             onError: (err) => toast.error(err),
@@ -56,7 +56,7 @@ const EditForm: FC<EditFormProps> = (
     return (
         <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
             <FormDialog.Body
-                title="Edit Partner"
+                title="Edit Exhibition"
                 buttonLabel="Update"
                 loading={isEditFormSubmitting}
                 onSubmit={handleEditFormSubmit}
@@ -67,36 +67,42 @@ const EditForm: FC<EditFormProps> = (
                     value={formData["name"]}
                     onChange={handleFormDataChange}
                 />
-
-                <FormDialog.SelectInput
-                    label="Type"
-                    name="type"
-                    options={PartnerTypes}
-                    value={formData["type"]}
+                <FormDialog.TextInput
+                    label="Title"
+                    name="title"
+                    value={formData["title"]}
                     onChange={handleFormDataChange}
                 />
 
                 <FormDialog.TextInput
-                    label="Company"
-                    name="company"
-                    value={formData["company"]}
+                    label="Organizer"
+                    name="organizer"
+                    value={formData["organizer"]}
                     onChange={handleFormDataChange}
                 />
+
 
                 <FormDialog.DateInput
-                    label="Joined"
-                    name="joined"
-                    value={formData["joined"]}
+                    label="Dates"
+                    name="date"
+                    value={formData["dates"]}
                     onChange={handleFormDataChange}
                 />
 
                 <FormDialog.TextInput
-                    label="Email"
-                    name="email"
-                    value={formData["email"]}
+                    label="Capacity"
+                    name="capacity"
+                    value={String(formData["capacity"])}
                     onChange={handleFormDataChange}
-                    type="email"
-                    full
+                    type="number"
+                />
+
+                <FormDialog.SelectInput
+                    label="Status"
+                    name="status"
+                    options={exhibitionStatuses}
+                    value={String(formData["status"])}
+                    onChange={handleFormDataChange}
                 />
             </FormDialog.Body>
         </FormDialog>
