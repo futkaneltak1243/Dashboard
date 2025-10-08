@@ -1,4 +1,3 @@
-import { Button } from "../../components/Button"
 import type { Exhibition } from "../../types/exhibitions"
 
 import useFetch from "../../hooks/useFetch/useFetch"
@@ -7,6 +6,7 @@ import { Pagination } from "../../components/advaned"
 import Search from "./Search"
 import { useCallback, useState } from "react"
 import ExhibitionTable from "./ExhibitionsTable"
+import CreateButton from "./CreateButton"
 
 
 
@@ -81,7 +81,12 @@ const Exhibitions = () => {
         <div className="p-[15px] md:p-[30px] w-full overflow-x-scroll">
             <h1 className="text-text-light dark:text-text-dark text-3xl">Exhibitions</h1>
             <div className="flex justify-end mt-4">
-                <Button>Add Exhibition</Button>
+                <CreateButton
+                    formData={formData}
+                    handleFormDataChange={handleFormDataChange}
+                    resetFormData={resetFormData}
+                    refetch={refetch}
+                />
             </div>
             <div className="mt-4 flex justify-start">
                 <Search />

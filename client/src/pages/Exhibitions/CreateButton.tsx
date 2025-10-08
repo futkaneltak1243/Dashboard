@@ -1,65 +1,65 @@
-import { useState, type Dispatch, type FC, type SetStateAction } from "react";
+import { useEffect, useState, type FC } from "react"
 import { FormDialog } from "../../components/FormDialog"
-import { handleSubmit } from "../../utils/handleSubmit";
-import toast from "react-hot-toast";
-import type { Exhibition, ExhibitionStatus } from "../../types/exhibitions";
+import { Button } from "../../components/Button"
+import { handleSubmit } from "../../utils/handleSubmit"
+import toast from "react-hot-toast"
+import type { Exhibition, ExhibitionStatus } from "../../types/exhibitions"
 
 
-interface EditFormProps {
-    editFormOpen: boolean;
-    setEditFormOpen: Dispatch<SetStateAction<boolean>>;
-    formData: Omit<Exhibition, "id">;
-    selectedExhibition: Exhibition | null;
-    refetch: () => void;
-    resetFormData: () => void;
-    setSelectedExhibition: Dispatch<SetStateAction<Exhibition | null>>;
+interface CreateButtonProps {
+    formData: Omit<Exhibition, "id">
     handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    resetFormData: () => void;
+    refetch: () => void;
+
 }
 
 const exhibitionStatuses: ExhibitionStatus[] = ["Upcoming", "Ongoing", "Completed", "Planned"]
 
-const EditForm: FC<EditFormProps> = (
+
+const CreateButton: FC<CreateButtonProps> = (
     {
-        editFormOpen,
-        setEditFormOpen,
         formData,
-        selectedExhibition,
-        refetch,
-        resetFormData,
-        setSelectedExhibition,
         handleFormDataChange,
+        resetFormData,
+        refetch,
     }
 ) => {
+    const [createFormOpen, setCreateFormOpen] = useState(false);
+    const [isCeateFormSubmitting, setIsCeateFormSubmitting] = useState(false)
 
-    const [isEditFormSubmitting, setIsEditFormSubmitting] = useState(false);
 
-
-    const handleEditFormSubmit = () => {
-        if (!selectedExhibition) return;
+    const handleCreateFormSubmit = () => {
         handleSubmit({
-            url: `/exhibitions/${selectedExhibition.id}`,
-            method: "PUT",
+            url: "/exhibitions",
+            method: "POST",
             data: formData,
             onSuccess: () => {
-                toast.success("Exhibition updated successfully");
-                setEditFormOpen(false);
                 resetFormData();
-                setSelectedExhibition(null);
-                refetch();
+                toast.success("exhibition added successfully");
+                setCreateFormOpen(false)
+                refetch()
             },
-            onError: (err) => toast.error(err),
-            setLoading: setIsEditFormSubmitting,
-        });
-    };
+            onError: (err) => { toast.error(err) },
+            setLoading: setIsCeateFormSubmitting
+        })
+    }
 
-
+    useEffect(() => {
+        if (!createFormOpen) {
+            resetFormData()
+        }
+    }, [createFormOpen]);
     return (
-        <FormDialog open={editFormOpen} setOpen={setEditFormOpen}>
+        <FormDialog open={createFormOpen} setOpen={setCreateFormOpen}>
+            <FormDialog.Trigger>
+                <Button>Add Exhibition</Button>
+            </FormDialog.Trigger>
             <FormDialog.Body
-                title="Edit Exhibition"
-                buttonLabel="Update"
-                loading={isEditFormSubmitting}
-                onSubmit={handleEditFormSubmit}
+                title="Add Partner"
+                buttonLabel="Save"
+                loading={isCeateFormSubmitting}
+                onSubmit={handleCreateFormSubmit}
             >
                 <FormDialog.TextInput
                     label="Name"
@@ -114,7 +114,8 @@ const EditForm: FC<EditFormProps> = (
                 />
             </FormDialog.Body>
         </FormDialog>
+
     )
 }
 
-export default EditForm
+export default CreateButton
