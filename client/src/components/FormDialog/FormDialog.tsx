@@ -218,8 +218,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         const fileUrls = files.map((file) => URL.createObjectURL(file));
         setCombinedImages([...serverImages, ...fileUrls]);
 
-        console.log(files)
-        console.log(combinedImages)
+
         return () => {
             fileUrls.forEach(url => URL.revokeObjectURL(url));
         };

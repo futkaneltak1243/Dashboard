@@ -15,6 +15,7 @@ interface ProductProps {
     title: string;
     price: number;
     isFavorites: 1 | 0;
+    buttonClick?: () => void;
 }
 
 interface ProductsProps {
@@ -67,7 +68,7 @@ const Slider: FC<SliderProps> = ({ images }) => {
 }
 
 
-const Product: FC<ProductProps> = ({ images, title, price, isFavorites }) => {
+const Product: FC<ProductProps> = ({ images, title, price, isFavorites, buttonClick }) => {
     return (
         <div className=" rounded-xl shadow-sm overflow-hidden">
 
@@ -82,6 +83,7 @@ const Product: FC<ProductProps> = ({ images, title, price, isFavorites }) => {
                     <div>
                         <button
                             className=" w-full  p-2 sm:p-0 sm:w-[107px] sm:h-[32px] lg:w-[126px] lg:h-[38px] bg-layout-light dark:bg-items-dark2 rounded-lg text-[10px] sm:text-xs dark:text-text-dark text-text-light font-semibold cursor-pointer"
+                            onClick={buttonClick}
                         >
                             Edit Product
                         </button>
