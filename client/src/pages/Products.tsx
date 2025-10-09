@@ -33,7 +33,7 @@ const Products = () => {
     const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
     const [name, setName] = useState<string>(initialName ? initialName : "")
 
-    const [images, setImages] = useState<string[]>([]);
+    const [files, setFiles] = useState<File[]>([]);
 
 
     const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -81,8 +81,10 @@ const Products = () => {
                     </FormDialog.Trigger>
                     <FormDialog.Body buttonLabel="Save">
                         <FormDialog.ImageInput
-                            images={images}
-                            setImages={setImages}
+                            serverImages={[]}
+                            setServerImages={() => null}
+                            files={files}
+                            setFiles={setFiles}
                             label="Images"
                         />
                     </FormDialog.Body>

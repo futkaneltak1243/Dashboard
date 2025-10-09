@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from "react"
+import { useEffect, useState, type FC, type ReactNode } from "react"
 import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
 import { X, LoaderCircle, Image as ImageIcon } from "lucide-react"
@@ -48,8 +48,10 @@ interface DateInputProps extends Omit<React.ComponentProps<"input">, "onChange" 
 
 interface ImageInputProps {
     label?: string;
-    images?: string[]; // array of image URLs or file preview URLs
-    setImages?: (e: string[]) => void;
+    serverImages: string[];
+    setServerImages: (images: string[]) => void;
+    files: File[];
+    setFiles: (files: File[]) => void;
     multiple?: boolean;
     className?: string;
 }
@@ -202,30 +204,50 @@ const DateInput: FC<DateInputProps> = ({ label, value, full = false, onChange, .
 
 const ImageInput: React.FC<ImageInputProps> = ({
     label,
-    images = [],
-    setImages,
+    serverImages = [],
+    setServerImages,
+    files = [],
+    setFiles,
     multiple = true,
     className,
 }) => {
+
+    const [combinedImages, setCombinedImages] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fileUrls = files.map((file) => URL.createObjectURL(file));
+        setCombinedImages([...serverImages, ...fileUrls]);
+
+        console.log(files)
+        console.log(combinedImages)
+        return () => {
+            fileUrls.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [serverImages, files]);
+
+
     const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const urls = files.map((file) => URL.createObjectURL(file));
-        setImages?.([...images, ...urls]);
-        e.target.value = ""
+        const uploadedFiles = Array.from(e.target.files || []);
+        setFiles([...files, ...uploadedFiles]);
+        e.target.value = "";
     };
 
     const handleRemove = (url: string) => {
-        const newValue = images.filter((v) => v !== url);
-        setImages?.(newValue);
+        if (serverImages.includes(url)) {
+            setServerImages(serverImages.filter(v => v !== url));
+        } else {
+            const fileIndex = combinedImages.indexOf(url) - serverImages.length;
+            if (fileIndex >= 0) {
+                const newFiles = files.filter((_, i) => i !== fileIndex);
+                setFiles(newFiles);
+                URL.revokeObjectURL(url);
+            }
+        }
     };
 
     return (
         <div className={cn("flex flex-col gap-2 col-span-2", className)}>
-            <p
-                className="mb-2"
-            >
-                {label}
-            </p>
+            <p className="mb-2">{label}</p>
             <label
                 htmlFor="image-upload"
                 className="w-full h-32 flex items-center justify-center border-2 border-dashed rounded-xl cursor-pointer text-gray-400 hover:text-gray-600"
@@ -240,12 +262,8 @@ const ImageInput: React.FC<ImageInputProps> = ({
                     className="hidden"
                 />
             </label>
-            <div
-                className={cn(
-                    " flex flex-wrap gap-3 items-center justify-start"
-                )}
-            >
-                {images.map((url, i) => (
+            <div className="flex flex-wrap gap-3 items-center justify-start">
+                {combinedImages.map((url, i) => (
                     <div
                         key={i}
                         className="relative w-20 h-20 rounded-xl overflow-hidden group"
@@ -264,13 +282,10 @@ const ImageInput: React.FC<ImageInputProps> = ({
                         </button>
                     </div>
                 ))}
-
-
             </div>
         </div>
     );
 };
-
 
 FormDialog.Trigger = Trigger
 FormDialog.Body = Body
