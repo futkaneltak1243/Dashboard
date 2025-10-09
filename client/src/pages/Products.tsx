@@ -8,6 +8,7 @@ import { useCallback, useState, type ChangeEvent } from "react";
 import { ActionButtons } from "../components/ActionButtons";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useFilters from "../hooks/useFilters/useFilters";
+import { FormDialog } from "../components/FormDialog";
 
 
 
@@ -31,6 +32,8 @@ const Products = () => {
     const page = get("page", "number")
     const { data, loading, error } = useFetch<Data>(location.pathname + location.search)
     const [name, setName] = useState<string>(initialName ? initialName : "")
+
+    const [images, setImages] = useState<string[]>([]);
 
 
     const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +62,6 @@ const Products = () => {
     if (!data) return null;
 
     const products = data.data
-    console.log(products)
 
     const handlePageChange = (p: number) => {
         if (p < 1) return
@@ -73,7 +75,18 @@ const Products = () => {
 
             <h1 className="text-text-light dark:text-text-dark text-3xl">Products</h1>
             <div className="flex justify-end mt-4">
-                <Button>Add Product</Button>
+                <FormDialog>
+                    <FormDialog.Trigger>
+                        <Button>Add Product</Button>
+                    </FormDialog.Trigger>
+                    <FormDialog.Body buttonLabel="Save">
+                        <FormDialog.ImageInput
+                            images={images}
+                            setImages={setImages}
+                            label="Images"
+                        />
+                    </FormDialog.Body>
+                </FormDialog>
             </div>
             <div className="mt-7">
                 <Searchbar
@@ -89,6 +102,7 @@ const Products = () => {
                 <Ps>
                     {products?.map((product: Product) => {
                         return <Ps.Product
+                            key={product.id}
                             images={product.images}
                             title={product.name} price={product.price}
                             isFavorites={product.isfavorite}

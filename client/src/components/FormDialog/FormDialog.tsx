@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from "react"
 import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
-import { X, LoaderCircle } from "lucide-react"
+import { X, LoaderCircle, Image as ImageIcon } from "lucide-react"
 import { Input } from "../Input";
 
 interface FormDialogProps {
@@ -45,12 +45,22 @@ interface DateInputProps extends Omit<React.ComponentProps<"input">, "onChange" 
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+
+interface ImageInputProps {
+    label?: string;
+    images?: string[]; // array of image URLs or file preview URLs
+    setImages?: (e: string[]) => void;
+    multiple?: boolean;
+    className?: string;
+}
+
 const FormDialog: FC<FormDialogProps> & {
     Trigger: FC<TriggerProps>,
     Body: FC<BodyProps>,
     TextInput: FC<TextInputProps>,
     SelectInput: FC<SelectInputProps>,
     DateInput: FC<DateInputProps>,
+    ImageInput: React.FC<ImageInputProps>,
 } = ({ children, open, setOpen }) => {
     return <Dialog open={open} setOpen={setOpen}>{children}</Dialog>
 }
@@ -190,10 +200,82 @@ const DateInput: FC<DateInputProps> = ({ label, value, full = false, onChange, .
     );
 };
 
+const ImageInput: React.FC<ImageInputProps> = ({
+    label,
+    images = [],
+    setImages,
+    multiple = true,
+    className,
+}) => {
+    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const urls = files.map((file) => URL.createObjectURL(file));
+        setImages?.([...images, ...urls]);
+        e.target.value = ""
+    };
+
+    const handleRemove = (url: string) => {
+        const newValue = images.filter((v) => v !== url);
+        setImages?.(newValue);
+    };
+
+    return (
+        <div className={cn("flex flex-col gap-2 col-span-2", className)}>
+            <p
+                className="mb-2"
+            >
+                {label}
+            </p>
+            <label
+                htmlFor="image-upload"
+                className="w-full h-32 flex items-center justify-center border-2 border-dashed rounded-xl cursor-pointer text-gray-400 hover:text-gray-600"
+            >
+                <ImageIcon size={22} />
+                <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    multiple={multiple}
+                    onChange={handleSelect}
+                    className="hidden"
+                />
+            </label>
+            <div
+                className={cn(
+                    " flex flex-wrap gap-3 items-center justify-start"
+                )}
+            >
+                {images.map((url, i) => (
+                    <div
+                        key={i}
+                        className="relative w-20 h-20 rounded-xl overflow-hidden group"
+                    >
+                        <img
+                            src={url}
+                            alt={`img-${i}`}
+                            className="w-full h-full object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => handleRemove(url)}
+                            className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hidden group-hover:block"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                ))}
+
+
+            </div>
+        </div>
+    );
+};
+
 
 FormDialog.Trigger = Trigger
 FormDialog.Body = Body
 FormDialog.TextInput = TextInput
 FormDialog.SelectInput = SelectInput
 FormDialog.DateInput = DateInput
+FormDialog.ImageInput = ImageInput
 export default FormDialog
