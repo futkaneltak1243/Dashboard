@@ -40,6 +40,11 @@ const ProductsGrid: FC<ProductsGridProps> = ({ products, refetch }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleDeleteClick = (product: Product) => {
+        setSelectedProduct(product)
+        setConfirmationOpen(true)
+    }
+
     return (
         <>
             <Confiramtion
@@ -70,6 +75,7 @@ const ProductsGrid: FC<ProductsGridProps> = ({ products, refetch }) => {
                         title={product.name} price={product.price}
                         isFavorites={product.isfavorite}
                         editClick={() => handleEditClick(product)}
+                        deleteClick={() => handleDeleteClick(product)}
                     />
                 })}
             </Products>

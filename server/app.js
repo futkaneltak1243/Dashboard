@@ -348,6 +348,30 @@ app.delete("/api/products/:id", (req, res) => {
     });
 });
 
+app.put("/api/products/:id/favorite", (req, res) => {
+    const { id } = req.params;
+    const { isfavorite } = req.body;
+
+    // Validation
+    if (isfavorite === undefined)
+        return res.status(400).json({ error: "isfavorite is required" });
+
+    const sql = `UPDATE products SET isfavorite = ? WHERE id = ?`;
+
+    db.run(sql, [Number(isfavorite), id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (this.changes === 0)
+            return res.status(404).json({ error: "Product not found" });
+
+        res.status(200).json({
+            id: Number(id),
+            isfavorite: Number(isfavorite),
+        });
+    });
+});
+
+
 
 /** 🔹 PARTNERS API */
 app.get("/api/partners", (req, res) => {
