@@ -42,7 +42,7 @@ const EditForm: FC<EditFormProps> = ({
             handleSubmit({
                 url: `/products/${selectedProduct.id}`,
                 method: "PUT",
-                data: { ...formData, images: [...serverImages, ...imageUrls] },
+                data: { ...formData, isfavorite: selectedProduct.isfavorite, images: [...serverImages, ...imageUrls] },
                 onSuccess: () => {
                     toast.success("product updated successfully");
                     setEditFormOpen(false);
