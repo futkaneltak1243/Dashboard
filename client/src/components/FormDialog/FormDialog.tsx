@@ -1,7 +1,7 @@
-import type { FC, ReactNode } from "react"
+import { useEffect, useState, type FC, type ReactNode } from "react"
 import { Dialog } from "../Dialog"
 import { cn } from "../classNames";
-import { X, LoaderCircle } from "lucide-react"
+import { X, LoaderCircle, Image as ImageIcon } from "lucide-react"
 import { Input } from "../Input";
 
 interface FormDialogProps {
@@ -45,12 +45,24 @@ interface DateInputProps extends Omit<React.ComponentProps<"input">, "onChange" 
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+
+interface ImageInputProps {
+    label?: string;
+    serverImages?: string[];
+    setServerImages?: (images: string[]) => void;
+    files: File[];
+    setFiles: (files: File[]) => void;
+    multiple?: boolean;
+    className?: string;
+}
+
 const FormDialog: FC<FormDialogProps> & {
     Trigger: FC<TriggerProps>,
     Body: FC<BodyProps>,
     TextInput: FC<TextInputProps>,
     SelectInput: FC<SelectInputProps>,
     DateInput: FC<DateInputProps>,
+    ImageInput: React.FC<ImageInputProps>,
 } = ({ children, open, setOpen }) => {
     return <Dialog open={open} setOpen={setOpen}>{children}</Dialog>
 }
@@ -190,10 +202,94 @@ const DateInput: FC<DateInputProps> = ({ label, value, full = false, onChange, .
     );
 };
 
+const ImageInput: React.FC<ImageInputProps> = ({
+    label,
+    serverImages = [],
+    setServerImages,
+    files = [],
+    setFiles,
+    multiple = true,
+    className,
+}) => {
+
+    const [combinedImages, setCombinedImages] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fileUrls = files.map((file) => URL.createObjectURL(file));
+        setCombinedImages([...serverImages, ...fileUrls]);
+
+
+        return () => {
+            fileUrls.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [serverImages, files]);
+
+
+    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const uploadedFiles = Array.from(e.target.files || []);
+        setFiles([...files, ...uploadedFiles]);
+        e.target.value = "";
+    };
+
+    const handleRemove = (url: string) => {
+        if (serverImages.includes(url)) {
+            setServerImages?.(serverImages.filter(v => v !== url));
+        } else {
+            const fileIndex = combinedImages.indexOf(url) - serverImages.length;
+            if (fileIndex >= 0) {
+                const newFiles = files.filter((_, i) => i !== fileIndex);
+                setFiles(newFiles);
+                URL.revokeObjectURL(url);
+            }
+        }
+    };
+
+    return (
+        <div className={cn("flex flex-col gap-2 col-span-2", className)}>
+            <p className="mb-2">{label}</p>
+            <label
+                htmlFor="image-upload"
+                className="w-full h-32 flex items-center justify-center border-2 border-dashed rounded-xl cursor-pointer text-gray-400 hover:text-gray-600"
+            >
+                <ImageIcon size={22} />
+                <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    multiple={multiple}
+                    onChange={handleSelect}
+                    className="hidden"
+                />
+            </label>
+            <div className="flex flex-wrap gap-3 items-center justify-start">
+                {combinedImages.map((url, i) => (
+                    <div
+                        key={i}
+                        className="relative w-20 h-20 rounded-xl overflow-hidden group"
+                    >
+                        <img
+                            src={url}
+                            alt={`img-${i}`}
+                            className="w-full h-full object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => handleRemove(url)}
+                            className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hidden group-hover:block"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
 
 FormDialog.Trigger = Trigger
 FormDialog.Body = Body
 FormDialog.TextInput = TextInput
 FormDialog.SelectInput = SelectInput
 FormDialog.DateInput = DateInput
+FormDialog.ImageInput = ImageInput
 export default FormDialog

@@ -2,12 +2,43 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
+
 
 const app = express();
 const db = new sqlite3.Database("database.db");
 
 app.use(cors());
 app.use(express.json());
+
+
+
+app.use("/uploads", express.static("uploads"));
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, "uploads/"),
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueName + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({ storage });
+
+
+app.post("/api/upload", upload.array("images", 20), (req, res) => {
+    if (!req.files || req.files.length === 0)
+        return res.status(400).json({ error: "No files uploaded" });
+
+    const urls = req.files.map(
+        (file) => `http://localhost:3000/uploads/${file.filename}`
+    );
+
+    res.json({ urls });
+});
+
+
 /** 🔹 USERS API */
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
@@ -194,7 +225,7 @@ app.delete("/api/users/:id", (req, res) => {
 
 /** 🔹 PRODUCTS API */
 app.get("/api/products", (req, res) => {
-    const { name, isfavorite, page = 1, limit = 10 } = req.query;
+    const { name, isfavorite, page = 1, limit = 9 } = req.query;
     const filters = [];
     const params = [];
 
@@ -244,6 +275,102 @@ app.get("/api/products", (req, res) => {
         });
     });
 });
+
+
+app.post("/api/products", (req, res) => {
+    const { name, price, images, isfavorite } = req.body;
+
+    if (!name || !price || !images)
+        return res.status(400).json({ error: "Missing required fields" });
+
+    const sql = `
+      INSERT INTO products (name, price, images, isfavorite)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    db.run(sql, [name, price, JSON.stringify(images), isfavorite || 0], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        res.status(201).json({
+            id: this.lastID,
+            name,
+            price,
+            images,
+            isfavorite: isfavorite || 0,
+        });
+    });
+});
+
+
+app.put("/api/products/:id", (req, res) => {
+    const { id } = req.params;
+    const { name, price, images, isfavorite } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !images)
+        return res.status(400).json({ error: "Missing required fields" });
+
+    const sql = `
+        UPDATE products
+        SET name = ?, price = ?, images = ?, isfavorite = ?
+        WHERE id = ?
+    `;
+
+    db.run(sql, [name, price, JSON.stringify(images), isfavorite || 0, id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (this.changes === 0)
+            return res.status(404).json({ error: "Product not found" });
+
+        res.status(200).json({
+            id: Number(id),
+            name,
+            price,
+            images,
+            isfavorite: isfavorite || 0,
+            message: "Product updated successfully",
+        });
+    });
+});
+
+app.delete("/api/products/:id", (req, res) => {
+    const { id } = req.params;
+
+    const sql = `DELETE FROM products WHERE id = ?`;
+
+    db.run(sql, [id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (this.changes === 0)
+            return res.status(404).json({ error: "Product not found" });
+
+        res.status(200).json({ message: "Product deleted successfully" });
+    });
+});
+
+app.put("/api/products/:id/favorite", (req, res) => {
+    const { id } = req.params;
+    const { isfavorite } = req.body;
+
+    // Validation
+    if (isfavorite === undefined)
+        return res.status(400).json({ error: "isfavorite is required" });
+
+    const sql = `UPDATE products SET isfavorite = ? WHERE id = ?`;
+
+    db.run(sql, [Number(isfavorite), id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (this.changes === 0)
+            return res.status(404).json({ error: "Product not found" });
+
+        res.status(200).json({
+            id: Number(id),
+            isfavorite: Number(isfavorite),
+        });
+    });
+});
+
 
 
 /** 🔹 PARTNERS API */
