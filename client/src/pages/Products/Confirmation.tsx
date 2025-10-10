@@ -13,7 +13,7 @@ interface ConfiramtionProps {
 }
 
 
-const Confiramtion: FC<ConfiramtionProps> = ({
+const Confirmation: FC<ConfiramtionProps> = ({
     confirmationOpen,
     setConfirmationOpen,
     selectedProduct,
@@ -57,4 +57,4 @@ const Confiramtion: FC<ConfiramtionProps> = ({
     )
 }
 
-export default Confiramtion
+export default Confirmation

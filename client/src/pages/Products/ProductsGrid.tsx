@@ -2,7 +2,8 @@ import { useCallback, useState, type FC, } from "react"
 import { Products } from "../../components/Products"
 import type { Product } from "../../types/product"
 import EditForm from "./EditForm";
-import Confiramtion from "./Confirmation";
+import Confirmation from "./Confirmation";
+import { toggleProductLike } from "../../utils/products";
 
 interface ProductsGridProps {
     products: Product[]
@@ -45,9 +46,17 @@ const ProductsGrid: FC<ProductsGridProps> = ({ products, refetch }) => {
         setConfirmationOpen(true)
     }
 
+    const handleLikeClick = useCallback((product: Product) => {
+        toggleProductLike(
+            product.id,
+            product.isfavorite === 1 ? 0 : 1,
+            refetch
+        )
+    }, [refetch])
+
     return (
         <>
-            <Confiramtion
+            <Confirmation
                 selectedProduct={selectedProduct}
                 confirmationOpen={confirmationOpen}
                 setConfirmationOpen={setConfirmationOpen}
@@ -76,6 +85,7 @@ const ProductsGrid: FC<ProductsGridProps> = ({ products, refetch }) => {
                         isFavorites={product.isfavorite}
                         editClick={() => handleEditClick(product)}
                         deleteClick={() => handleDeleteClick(product)}
+                        likeClick={() => handleLikeClick(product)}
                     />
                 })}
             </Products>
