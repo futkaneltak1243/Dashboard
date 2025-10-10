@@ -23,7 +23,7 @@ const OrdersTable: FC<OrdersTableProps> = ({ orders }) => {
                     <Table.HeadCell>
                         ADDRESS
                     </Table.HeadCell>
-                    <Table.HeadCell>
+                    <Table.HeadCell centered>
                         DATE
                     </Table.HeadCell>
                     <Table.HeadCell centered>
@@ -47,7 +47,7 @@ const OrdersTable: FC<OrdersTableProps> = ({ orders }) => {
                             <Table.Cell>
                                 {order.address}
                             </Table.Cell>
-                            <Table.Cell>
+                            <Table.Cell centered>
                                 {order.date}
                             </Table.Cell>
                             <Table.Cell centered>
