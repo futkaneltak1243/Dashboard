@@ -2,6 +2,8 @@ const sqlite3 = require("sqlite3").verbose();
 const { faker } = require("@faker-js/faker");
 const chalk = require("chalk");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 
 // Open database
 const db = new sqlite3.Database("database.db", (err) => {
@@ -57,24 +59,46 @@ db.serialize(() => {
 
     // PRODUCTS
     const insertProduct = db.prepare(`
-    INSERT INTO products (name, price, images, isfavorite) VALUES (?, ?, ?, ?)
-  `);
+        INSERT INTO products (name, price, images, isfavorite) VALUES (?, ?, ?, ?)
+      `);
 
+    // Folder with images
+    const uploadsDir = path.join(__dirname, "uploads");
+
+    // Get all image filenames (0.jpg to 38.jpg)
+    const allImages = fs.readdirSync(uploadsDir).filter(file => file.endsWith(".jpg"));
+
+    // Function to get random images
+    function getRandomImages(min = 3, max = 5) {
+        const count = Math.floor(Math.random() * (max - min + 1)) + min;
+        const selected = [];
+        const copy = [...allImages]; // clone array to avoid duplicates
+        for (let i = 0; i < count; i++) {
+            const idx = Math.floor(Math.random() * copy.length);
+            selected.push(copy[idx]);
+            copy.splice(idx, 1); // remove used image
+        }
+        return selected.map(f => `http://localhost:3000/uploads/${f}`); // full URL
+    }
+
+    // Function to insert a product
     const runProduct = (name, price, images, isfavorite) => {
-        insertProduct.run([name, price, images, isfavorite], (err) => {
+        insertProduct.run([name, price, JSON.stringify(images), isfavorite], (err) => {
             if (err) console.error(chalk.red("Failed to insert product:"), err.message);
         });
     };
 
+    // Seed products
     for (let i = 0; i < 25; i++) {
         runProduct(
             faker.commerce.productName(),
             faker.commerce.price({ min: 5, max: 500 }),
-            JSON.stringify([faker.image.urlPicsumPhotos(), faker.image.urlPicsumPhotos()]),
+            getRandomImages(3, 5),
             faker.datatype.boolean() ? 1 : 0
         );
     }
 
+    // Finalize
     insertProduct.finalize((err) => {
         if (err) console.error(chalk.red("Error finalizing products insert:"), err.message);
         else console.log(chalk.green("Products seeded."));
