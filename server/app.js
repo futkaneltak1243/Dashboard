@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 
-
+app.use("/uploads", express.static("uploads"));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, "uploads/"),
@@ -225,7 +225,7 @@ app.delete("/api/users/:id", (req, res) => {
 
 /** 🔹 PRODUCTS API */
 app.get("/api/products", (req, res) => {
-    const { name, isfavorite, page = 1, limit = 10 } = req.query;
+    const { name, isfavorite, page = 1, limit = 9 } = req.query;
     const filters = [];
     const params = [];
 

@@ -1,40 +1,79 @@
-import { useState, type Dispatch, type FC, type SetStateAction } from "react"
+import { useCallback, useState, type FC, } from "react"
 import { Products } from "../../components/Products"
 import type { Product } from "../../types/product"
+import EditForm from "./EditForm";
+import Confiramtion from "./Confirmation";
 
 interface ProductsGridProps {
     products: Product[]
-    formData: Omit<Product, "id" | "images" | "isfavorite">;
-    setFormData: Dispatch<SetStateAction<Omit<Product, "id" | "images" | "isfavorite">>>;
     refetch: () => void;
-    handleFormDataChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    resetFormData: () => void;
 }
 
-const ProductsGrid: FC<ProductsGridProps> = ({ products, formData, setFormData, refetch, handleFormDataChange, resetFormData }) => {
+const ProductsGrid: FC<ProductsGridProps> = ({ products, refetch }) => {
 
-    const [editFormOpen, setEditFormOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [formData, setFormData] = useState({
+        name: "",
+        price: "",
+    })
 
-    const handleEditClick = (product: Product) => {
-        setSelectedProduct(product);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [files, setFiles] = useState<File[]>([]);
+    const [serverImages, setServerImages] = useState<string[]>([])
+    const [editFormOpen, setEditFormOpen] = useState(false)
+    const [confirmationOpen, setConfirmationOpen] = useState(false)
+
+
+
+    const handleEditClick = useCallback((product: Product) => {
+        setSelectedProduct(product)
         setFormData({
             name: product.name,
-            price: product.price
-        });
-        setEditFormOpen(true);
+            price: String(product.price),
+        })
+        setServerImages(product.images)
+        setFiles([])
+        setEditFormOpen(true)
+    }, [])
+
+    const handleFormDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
+
     return (
-        <Products>
-            {products?.map((product: Product) => {
-                return <Products.Product
-                    key={product.id}
-                    images={product.images}
-                    title={product.name} price={product.price}
-                    isFavorites={product.isfavorite}
-                />
-            })}
-        </Products>
+        <>
+            <Confiramtion
+                selectedProduct={selectedProduct}
+                confirmationOpen={confirmationOpen}
+                setConfirmationOpen={setConfirmationOpen}
+                refetch={refetch}
+            />
+
+            <EditForm
+                editFormOpen={editFormOpen}
+                setEditFormOpen={setEditFormOpen}
+                formData={formData}
+                handleFormDataChange={handleFormDataChange}
+                serverImages={serverImages}
+                setServerImages={setServerImages}
+                files={files}
+                setFiles={setFiles}
+                selectedProduct={selectedProduct}
+                refetch={refetch}
+            />
+
+            <Products>
+                {products?.map((product: Product) => {
+                    return <Products.Product
+                        key={product.id}
+                        images={product.images}
+                        title={product.name} price={product.price}
+                        isFavorites={product.isfavorite}
+                        editClick={() => handleEditClick(product)}
+                    />
+                })}
+            </Products>
+        </>
     )
 }
 

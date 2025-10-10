@@ -48,8 +48,8 @@ interface DateInputProps extends Omit<React.ComponentProps<"input">, "onChange" 
 
 interface ImageInputProps {
     label?: string;
-    serverImages: string[];
-    setServerImages: (images: string[]) => void;
+    serverImages?: string[];
+    setServerImages?: (images: string[]) => void;
     files: File[];
     setFiles: (files: File[]) => void;
     multiple?: boolean;
@@ -233,7 +233,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
 
     const handleRemove = (url: string) => {
         if (serverImages.includes(url)) {
-            setServerImages(serverImages.filter(v => v !== url));
+            setServerImages?.(serverImages.filter(v => v !== url));
         } else {
             const fileIndex = combinedImages.indexOf(url) - serverImages.length;
             if (fileIndex >= 0) {

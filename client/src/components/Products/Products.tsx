@@ -1,8 +1,9 @@
 import type { FC, ReactNode } from "react"
 import { useCallback, useState } from "react"
-import { ChevronRight, ChevronLeft } from "lucide-react"
+import { ChevronRight, ChevronLeft, Trash2 } from "lucide-react"
 import { cn } from "../classNames"
 import { Heart } from 'lucide-react';
+import { ActionButtons } from "../ActionButtons";
 
 
 interface SliderProps {
@@ -15,7 +16,8 @@ interface ProductProps {
     title: string;
     price: number;
     isFavorites: 1 | 0;
-    buttonClick?: () => void;
+    editClick?: () => void;
+    deleteClick?: () => void;
 }
 
 interface ProductsProps {
@@ -68,7 +70,7 @@ const Slider: FC<SliderProps> = ({ images }) => {
 }
 
 
-const Product: FC<ProductProps> = ({ images, title, price, isFavorites, buttonClick }) => {
+const Product: FC<ProductProps> = ({ images, title, price, isFavorites, editClick, deleteClick }) => {
     return (
         <div className=" rounded-xl shadow-sm overflow-hidden">
 
@@ -80,16 +82,17 @@ const Product: FC<ProductProps> = ({ images, title, price, isFavorites, buttonCl
                         <p className="text-xs sm:text-sm md:text-base lg:text-lg text-text-light dark:text-text-dark font-semibold mb-[8px]">{title}</p>
                         <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-[#4880FF]">${price.toFixed(2)}</p>
                     </div>
-                    <div>
+                    <div >
                         <button
                             className=" w-full  p-2 sm:p-0 sm:w-[107px] sm:h-[32px] lg:w-[126px] lg:h-[38px] bg-layout-light dark:bg-items-dark2 rounded-lg text-[10px] sm:text-xs dark:text-text-dark text-text-light font-semibold cursor-pointer"
-                            onClick={buttonClick}
+                            onClick={editClick}
                         >
                             Edit Product
                         </button>
+
                     </div>
                 </div>
-                <div className="flex-1 flex justify-end ">
+                <div className="flex-1 flex justify-between items-end flex-col h-full">
                     <button className="w-[20px] h-[20px] sm:w-[30px] sm:h-[30px] lg:w-[44px] lg:h-[44px] bg-[#F9F9F9] flex items-center justify-center rounded-full cursor-pointer dark:bg-items-dark2">
                         <Heart className={cn("w-3 h-3 sm:w-4 sm:h-4 md:w-5 lg:w-6 md:h-5 lg:h-6  text-red-500",
                             {
@@ -98,6 +101,10 @@ const Product: FC<ProductProps> = ({ images, title, price, isFavorites, buttonCl
                         )} />
 
                     </button>
+
+                    <ActionButtons>
+                        <ActionButtons.Button Icon={Trash2} type="icon" iconClass="w-5 h-5" onClick={deleteClick} />
+                    </ActionButtons>
                 </div>
 
             </div>
