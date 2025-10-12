@@ -768,6 +768,35 @@ app.get("/api/orders", (req, res) => {
     });
 });
 
+app.get("/api/notifications", (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const baseSql = `FROM notifications`;
+    const sql = `SELECT * ${baseSql} ORDER BY id DESC LIMIT ? OFFSET ?`;
+    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
+
+    db.get(countSql, [], (err, countResult) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        db.all(sql, [parseInt(limit), offset], (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            const total = countResult.total;
+            res.status(200).json({
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / limit),
+                count: rows.length,
+                data: rows,
+            });
+        });
+    });
+});
+
+
 app.get("/api/search", (req, res) => {
     const { key } = req.query;
     if (!key) {
