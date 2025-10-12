@@ -39,6 +39,45 @@ app.post("/api/upload", upload.array("images", 20), (req, res) => {
 });
 
 
+/** Dashboard API */
+
+app.get("/api/dashboard", (req, res) => {
+    const queries = {
+        users: "SELECT COUNT(*) AS count FROM users",
+        orders: "SELECT COUNT(*) AS count FROM orders",
+        products: "SELECT COUNT(*) AS count FROM products",
+        exhibitions: "SELECT COUNT(*) AS count FROM exhibitions",
+    };
+
+    const result = {};
+
+    // Function to execute each query sequentially
+    db.serialize(() => {
+        db.get(queries.users, (err, row) => {
+            if (err) return res.status(500).json({ error: err.message });
+            result.users = row.count;
+
+            db.get(queries.orders, (err, row) => {
+                if (err) return res.status(500).json({ error: err.message });
+                result.orders = row.count;
+
+                db.get(queries.products, (err, row) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    result.products = row.count;
+
+                    db.get(queries.exhibitions, (err, row) => {
+                        if (err) return res.status(500).json({ error: err.message });
+                        result.exhibitions = row.count;
+
+                        // All queries done → send response
+                        res.json(result);
+                    });
+                });
+            });
+        });
+    });
+});
+
 /** 🔹 USERS API */
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
