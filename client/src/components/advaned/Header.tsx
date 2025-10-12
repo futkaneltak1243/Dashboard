@@ -1,10 +1,12 @@
-import type { FC } from "react"
+import { useState, type FC } from "react"
 import { Menu, Settings } from "lucide-react"
 import { Searchbar } from "../Searchbar"
 import { Notification } from "../Notification"
 import { AccountMenu } from "../AccountMenu"
 import { useSidebar } from "../../contexts/sidebar-context/SidebarContextProvider"
 import { Link } from "react-router-dom"
+import useFetch from "../../hooks/useFetch/useFetch"
+import { useDebounce } from "../../hooks/useDebounce"
 
 type SearchItem = {
     location: string;
@@ -16,23 +18,12 @@ type Data = SearchItem[]
 
 const Header: FC = () => {
     const { setIsSidebarOpen } = useSidebar()
-    const data: Data = [
-        {
-            location: 'Users',
-            key: "Furkan",
-            link: "fufu/gmail.com"
-        },
-        {
-            location: 'Users',
-            key: "Furkan",
-            link: "fufu/gmail.com"
-        },
-        {
-            location: 'Users',
-            key: "Furkan",
-            link: "fufu/gmail.com"
-        },
-    ]
+    const [key, setKey] = useState("")
+    const debouncedKey = useDebounce(key)
+    const { data } = useFetch<Data>(debouncedKey ? `/search?key=${debouncedKey}` : null);
+
+    const searchData = key ? data || [] : [];
+
     return (
         <header className="flex w-full items-center justify-between bg-items-light dark:bg-items-dark h-[70px] shrink-0">
             <div className="ml-3 sm:ml-[31px] flex items-center w-2/3 sm:w-1/2">
@@ -40,10 +31,10 @@ const Header: FC = () => {
                     <Menu className="text-text-light dark:text-text-dark" />
                 </button>
                 <div className="w-full relative">
-                    <Searchbar size="md" />
-                    {data.length > 0 && (
+                    <Searchbar size="md" value={key} onChange={(e) => setKey(e.target.value)} />
+                    {searchData.length > 0 && (
                         <div className="absolute top-10 left-0 w-full max-w-[393px] bg-white rounded-lg border border-lightgray shadow-lg overflow-hidden divide-y-[1px] divide-lightgray z-50">
-                            {data.map((item: SearchItem, index: number) => (
+                            {searchData.map((item: SearchItem, index: number) => (
                                 <Link
                                     key={index}
                                     to={item.link}
