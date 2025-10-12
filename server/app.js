@@ -652,15 +652,16 @@ app.delete("/api/exhibitions/:id", (req, res) => {
 });
 
 
-/** 🔹 ORDERS API */
+/** 🔹 ORDERS API  */
 app.get("/api/orders", (req, res) => {
     const { date, status, page = 1, limit = 10 } = req.query;
     const filters = [];
     const params = [];
 
     if (date) {
-        filters.push(`o.date = ?`);
-        params.push(date);
+        const dates = Array.isArray(date) ? date : [date];
+        filters.push(`o.date IN (${dates.map(() => "?").join(",")})`);
+        params.push(...dates);
     }
 
     if (status) {
@@ -680,6 +681,7 @@ app.get("/api/orders", (req, res) => {
         ${whereClause}
     `;
 
+    // ✅ Add user email + total sum
     const sql = `
         SELECT 
             o.id,
@@ -687,6 +689,8 @@ app.get("/api/orders", (req, res) => {
             o.date,
             o.status,
             u.fullname AS user_fullname,
+            u.email AS user_email,
+            COALESCE(SUM(p.price), 0) AS total,
             COALESCE(
                 json_group_array(
                     json_object('name', p.name, 'price', p.price)
@@ -696,6 +700,7 @@ app.get("/api/orders", (req, res) => {
         GROUP BY o.id
         LIMIT ? OFFSET ?
     `;
+
     const countSql = `SELECT COUNT(DISTINCT o.id) AS total ${baseSql}`;
     const finalParams = [...params, parseInt(limit), offset];
 
@@ -707,6 +712,7 @@ app.get("/api/orders", (req, res) => {
 
             const formattedRows = rows.map(row => ({
                 ...row,
+                total: parseFloat(row.total || 0),
                 products: JSON.parse(row.products)
             }));
 
@@ -722,6 +728,7 @@ app.get("/api/orders", (req, res) => {
         });
     });
 });
+
 
 app.listen(3000, () => {
     console.log("Server started on PORT :3000");
