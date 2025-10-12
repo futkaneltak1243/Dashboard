@@ -2,14 +2,9 @@ import { useLocation } from "react-router-dom";
 import { Pagination } from "../components/advaned";
 import { Table } from "../components/Table"
 import useFetch from "../hooks/useFetch/useFetch";
+import type { Notification } from "../types/notifications";
 
-type NotificationType = "user_edited" | "order_created" | "user_created" | "user_deleted"
 
-type Notification = {
-    id: number;
-    type: NotificationType;
-    message: string;
-}
 
 interface Data {
     page: number;
