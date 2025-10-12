@@ -768,6 +768,87 @@ app.get("/api/orders", (req, res) => {
     });
 });
 
+app.get("/api/search", (req, res) => {
+    const { key } = req.query;
+    if (!key) {
+        return res.status(400).json({ error: "Search key is required." });
+    }
+
+    const searchTerm = `%${key}%`;
+
+    const queries = [
+        {
+            sql: "SELECT fullname AS name FROM users WHERE fullname LIKE ? LIMIT 3",
+            location: "Users",
+            linkPrefix: "users?name=",
+        },
+        {
+            sql: "SELECT name FROM partners WHERE name LIKE ? LIMIT 3",
+            location: "Partners",
+            linkPrefix: "partners?name=",
+        },
+        {
+            sql: "SELECT title FROM exhibitions WHERE title LIKE ? LIMIT 3",
+            location: "Exhibitions",
+            linkPrefix: "exhibitions?title=",
+        },
+        {
+            sql: "SELECT name FROM products WHERE name LIKE ? LIMIT 3",
+            location: "Products",
+            linkPrefix: "products?name=",
+        },
+    ];
+
+    const allResults = [];
+    let completed = 0;
+
+    queries.forEach(({ sql, location, linkPrefix }) => {
+        db.all(sql, [searchTerm], (err, rows) => {
+            completed++;
+
+            if (!err && rows.length > 0) {
+                rows.forEach((row) => {
+                    const keyName = row.name || row.title;
+                    allResults.push({
+                        location,
+                        key: keyName,
+                        link: `${linkPrefix}${encodeURIComponent(keyName)}`,
+                    });
+                });
+            }
+
+            // After all 4 queries finish
+            if (completed === queries.length) {
+                if (allResults.length === 0) {
+                    return res.status(200).json([]);
+                }
+
+                // Try to interleave results from different tables
+                const grouped = {};
+                allResults.forEach((r) => {
+                    if (!grouped[r.location]) grouped[r.location] = [];
+                    grouped[r.location].push(r);
+                });
+
+                const mixed = [];
+                let added = true;
+                while (mixed.length < 3 && added) {
+                    added = false;
+                    for (const loc of ["Users", "Partners", "Exhibitions", "Products"]) {
+                        if (grouped[loc] && grouped[loc].length > 0 && mixed.length < 3) {
+                            mixed.push(grouped[loc].shift());
+                            added = true;
+                        }
+                    }
+                }
+
+                res.status(200).json(mixed);
+            }
+        });
+    });
+});
+
+
 
 app.listen(3000, () => {
     console.log("Server started on PORT :3000");

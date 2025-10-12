@@ -1,8 +1,9 @@
-import { useCallback, useState, type ChangeEvent, memo } from "react"
+import { useCallback, useState, type ChangeEvent, memo, useEffect } from "react"
 import { FilterBar } from "../../components/Filter"
 import { Searchbar } from "../../components/Searchbar"
 import type { UserFilters, UserRole, UserStatus } from "../../types/user"
 import useFilters from "../../hooks/useFilters/useFilters"
+import { useDebounce } from "../../hooks/useDebounce"
 
 
 const roleFilters: UserRole[] = ['Super Admin', 'Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']
@@ -21,6 +22,8 @@ const FiltersAndSearch = () => {
     const [selectedRoleFiltres, setSelectedRoleFilteres] = useState<UserRole[]>(role ? role : [])
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<UserStatus[]>(status ? status : [])
     const [name, setName] = useState<string>(initialName ? initialName : "")
+
+    const debouncedName = useDebounce(name)
 
 
 
@@ -55,6 +58,10 @@ const FiltersAndSearch = () => {
     const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value)
     }, [])
+
+    useEffect(() => {
+        setFilters({ name: debouncedName })
+    }, [debouncedName])
 
     return (
         <>
@@ -91,7 +98,6 @@ const FiltersAndSearch = () => {
                     color="default"
                     size="sm"
                     placeholder="Search Users..."
-                    buttonClick={() => setFilters({ name: name })}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
                     value={name}
                 />

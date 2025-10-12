@@ -6,7 +6,7 @@ interface FetchState<T> {
     error: string | null;
 }
 
-export default function useFetch<T>(url: string, options?: RequestInit) {
+export default function useFetch<T>(url: string | null, options?: RequestInit) {
     const [state, setState] = useState<FetchState<T>>({
         data: null,
         loading: true,
@@ -43,7 +43,10 @@ export default function useFetch<T>(url: string, options?: RequestInit) {
             }
         }
 
-        fetchData();
+        if (url) {
+            fetchData();
+
+        }
 
         return () => {
             isMounted = false;

@@ -7,6 +7,7 @@ interface NotificationProps {
     children?: ReactNode;
     notificationCount?: number;
     className?: string;
+    zIndex: number;
 }
 
 interface ItemProps {
@@ -18,7 +19,7 @@ interface ItemProps {
 
 const Notification: FC<NotificationProps> & {
     Item: FC<ItemProps>,
-} = ({ children, className, notificationCount = 0 }) => {
+} = ({ children, className, notificationCount = 0, zIndex }) => {
     return (
         <TriggerWithPopover className={cn("flex", className)}>
             <TriggerWithPopover.Trigger>
@@ -34,7 +35,7 @@ const Notification: FC<NotificationProps> & {
 
                 </div>
             </TriggerWithPopover.Trigger>
-            <TriggerWithPopover.Popover>
+            <TriggerWithPopover.Popover z={zIndex}>
                 <div className="bg-items-light dark:bg-items-dark rounded-2xl w-[254px] shadow-lg" >
                     <p className="text-sm py-[14px] text-text-light dark:text-text-dark pl-[20px]">Notification</p>
                     <div className="h-[1px] bg-darkgray dark:bg-lightgray"></div>
