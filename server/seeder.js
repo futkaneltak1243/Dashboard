@@ -179,11 +179,17 @@ db.serialize(() => {
         });
     };
 
+    const today = new Date();
+
     for (let i = 0; i < 50; i++) {
+        // Calculate a date between 20 days ago and today
+        const date = new Date(today);
+        date.setDate(today.getDate() - 20 + Math.floor((i / 49) * 20)); // Spread over 20 days
+
         runOrder(
             faker.number.int({ min: 1, max: 100 }),
             faker.location.streetAddress(),
-            faker.date.recent().toISOString().split("T")[0],
+            date.toISOString().split("T")[0],
             faker.helpers.arrayElement(orderStatuses)
         );
     }
