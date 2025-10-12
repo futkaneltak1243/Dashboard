@@ -2,7 +2,7 @@ import { Dashboard } from "../components/Dashboard"
 import { Sidebar } from "../components/Sidebar"
 import { Header } from "../components/advaned/"
 import { Outlet } from "react-router-dom"
-import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar } from "lucide-react"
+import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar, Bell } from "lucide-react"
 import { Toaster } from "react-hot-toast"
 
 const Layout = () => {
@@ -19,6 +19,7 @@ const Layout = () => {
                 <Sidebar.NavItem Icon={SquareMenu} title="Orders" to="/orders" />
                 <Sidebar.NavItem Icon={Handshake} title="Partners" to="/partners" />
                 <Sidebar.NavItem Icon={Calendar} title="Exhibitions" to="/exhibitions" />
+                <Sidebar.NavItem Icon={Bell} title="Notifications" to="/notifications" />
 
 
                 <Sidebar.Separator />
