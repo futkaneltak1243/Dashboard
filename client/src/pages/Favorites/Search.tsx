@@ -1,7 +1,8 @@
-import { useCallback, useState, type ChangeEvent } from "react"
+import { useCallback, useEffect, useState, type ChangeEvent } from "react"
 import { Searchbar } from "../../components/Searchbar"
 import useFilters from "../../hooks/useFilters/useFilters"
 import type { ProductFilters } from "../../types/product"
+import { useDebounce } from "../../hooks/useDebounce"
 
 
 const Search = () => {
@@ -11,17 +12,24 @@ const Search = () => {
 
     const [name, setName] = useState<string>(initialName ? initialName : "")
 
+    const debouncedName = useDebounce(name)
 
     const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value)
     }, [])
+
+    useEffect(() => {
+        setFilters({ name: debouncedName })
+    }, [debouncedName])
+
+
+
 
     return (
         <Searchbar
             color="default"
             size="sm"
             placeholder="Search Product..."
-            buttonClick={() => setFilters({ name: name })}
             onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchInputChange(e)}
             value={name}
         />
