@@ -1,6 +1,6 @@
 import { Dashboard } from "../components/Dashboard"
 import { Sidebar } from "../components/Sidebar"
-import { Header } from "../components/Header"
+import { Header } from "../components/advaned/"
 import { Outlet } from "react-router-dom"
 import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar } from "lucide-react"
 import { Toaster } from "react-hot-toast"
