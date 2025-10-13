@@ -2,6 +2,9 @@ import { SquareMenu, Pencil, CirclePlus, Trash2 } from "lucide-react"
 import { Notification } from "../../Notification"
 import useFetch from "../../../hooks/useFetch/useFetch"
 import type { Notification as Not } from "../../../types/notifications";
+import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
+
 
 interface Data {
     page: number;
@@ -44,7 +47,22 @@ const icons: Record<IconTypes, IconEntry> = {
 };
 
 const Notifications = () => {
-    const { data } = useFetch<Data>("/notifications?limit=4")
+    const [notificationCount, setNotificationCount] = useState(0)
+    const { data, refetch } = useFetch<Data>("/notifications?limit=4")
+
+
+    useEffect(() => {
+        const socket = io("http://localhost:3000");
+
+        socket.on("notification", () => {
+            setNotificationCount((p) => p + 1);
+            refetch(); // re-fetch new notifications
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [refetch]);
 
     const notifications = data?.data || []
 
@@ -53,6 +71,7 @@ const Notifications = () => {
             className="mr-3 sm:mr-[31px]"
             zIndex={50}
             bottomLink="/notifications"
+            notificationCount={notificationCount}
         >
             {
                 notifications.map((notification: Not) => {
