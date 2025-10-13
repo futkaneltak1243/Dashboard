@@ -4,13 +4,20 @@ import { Header } from "../components/advaned/"
 import { Outlet } from "react-router-dom"
 import { ChartColumn, UsersRound, Package, SquareMenu, Settings, Heart, Handshake, Calendar, Bell } from "lucide-react"
 import { Toaster } from "react-hot-toast"
+import { useSidebar } from "../contexts/sidebar-context/SidebarContextProvider"
 
 const Layout = () => {
+    const { isSidebarOpen } = useSidebar()
     return (
         <Dashboard>
             <Sidebar>
                 <Sidebar.Header>
-                    Furkan
+                    {
+                        isSidebarOpen ?
+                            <p className="text-black dark:text-white font-semibold">Furkan<span className="text-primary">Dashboard</span></p> :
+                            <p className="text-black dark:text-white font-semibold">Furkan</p>
+
+                    }
                 </Sidebar.Header>
                 <Sidebar.NavItem Icon={ChartColumn} title="Dashboard" to="/" />
                 <Sidebar.NavItem Icon={UsersRound} title="Users" to="/users" />

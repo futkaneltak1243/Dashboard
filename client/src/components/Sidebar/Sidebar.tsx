@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import { useSidebar } from "../../contexts/sidebar-context/SidebarContextProvider";
 import { cn } from "../classNames";
 import type { FC, ReactNode, ElementType } from "react";
@@ -129,7 +130,7 @@ const Sidebar: FC<SidebarProps> & {
     Separator: FC<SeparatorProps>;
     Title: FC<TitleProps>;
 } = (({ className, children }) => {
-    const { isSidebarOpen } = useSidebar()
+    const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
     return (
         <div
             className={cn(
@@ -140,6 +141,13 @@ const Sidebar: FC<SidebarProps> & {
                 }
             )}
         >
+            {isSidebarOpen &&
+                <button
+                    className="absolute top-3 right-3 cursor-pointer sm:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                >
+                    <X className="text-black dark:text-white" />
+                </button>}
             {children}
         </div>
     );
