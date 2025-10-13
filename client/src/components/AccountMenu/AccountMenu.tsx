@@ -15,6 +15,7 @@ interface ItemProps {
     Icon: ElementType,
     label: string,
     onClick: () => void;
+    iconClass?: string
 }
 
 const AccountMenu: FC<AccountMenuProps> & {
@@ -53,7 +54,7 @@ const AccountMenu: FC<AccountMenuProps> & {
 }
 
 
-const Item: FC<ItemProps> = ({ Icon, label, onClick }) => {
+const Item: FC<ItemProps> = ({ Icon, label, onClick, iconClass }) => {
 
 
     return (
@@ -61,7 +62,7 @@ const Item: FC<ItemProps> = ({ Icon, label, onClick }) => {
             <div className="h-[44px] flex items-center">
                 <div className="ml-[20px] mr-[10px]">
 
-                    <Icon size={20} className="text-black dark:text-white" />
+                    <Icon size={20} className={cn("text-black ", iconClass)} />
 
                 </div>
                 <div className="text-sm text-text-light dark:text-text-dark">
