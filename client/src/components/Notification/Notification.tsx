@@ -1,4 +1,4 @@
-import type { FC, ReactNode, ElementType } from "react"
+import type { FC, ReactNode, ElementType, Dispatch, SetStateAction } from "react"
 import { TriggerWithPopover } from "../TriggerWithPopover";
 import { Bell } from "lucide-react"
 import { cn } from "../classNames"
@@ -10,6 +10,9 @@ interface NotificationProps {
     className?: string;
     zIndex: number;
     bottomLink: string;
+    open?: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>;
+    onClick?: () => void;
 }
 
 interface ItemProps {
@@ -22,10 +25,10 @@ interface ItemProps {
 
 const Notification: FC<NotificationProps> & {
     Item: FC<ItemProps>,
-} = ({ children, className, notificationCount = 0, zIndex, bottomLink }) => {
+} = ({ children, className, notificationCount = 0, zIndex, bottomLink, open, setOpen, onClick }) => {
     return (
-        <TriggerWithPopover className={cn("flex", className)}>
-            <TriggerWithPopover.Trigger>
+        <TriggerWithPopover className={cn("flex", className)} open={open} setOpen={setOpen}>
+            <TriggerWithPopover.Trigger onClick={onClick}>
                 <div className="relative">
                     <Bell className="text-primary" />
                     <div className={cn("absolute w-[17px] h-[17px] bg-[#979797] text-white items-center justify-center top-[-4px] right-[-4px] hidden rounded-full text-[10px]",

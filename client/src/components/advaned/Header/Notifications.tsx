@@ -3,7 +3,7 @@ import { Notification } from "../../Notification"
 import useFetch from "../../../hooks/useFetch/useFetch"
 import type { Notification as Not } from "../../../types/notifications";
 import { io } from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 
 interface Data {
@@ -49,13 +49,20 @@ const icons: Record<IconTypes, IconEntry> = {
 const Notifications = () => {
     const [notificationCount, setNotificationCount] = useState(0)
     const { data, refetch } = useFetch<Data>("/notifications?limit=4")
+    const [open, setOpen] = useState(false)
+    const openRef = useRef(open);
+    useEffect(() => {
+        openRef.current = open;
+    }, [open]);
 
 
     useEffect(() => {
         const socket = io("http://localhost:3000");
 
         socket.on("notification", () => {
-            setNotificationCount((p) => p + 1);
+            if (!openRef.current) {
+                setNotificationCount((p) => p + 1);
+            }
             refetch(); // re-fetch new notifications
         });
 
@@ -63,6 +70,10 @@ const Notifications = () => {
             socket.disconnect();
         };
     }, [refetch]);
+
+    const handleClick = useCallback(() => {
+        !open && setNotificationCount(0)
+    }, [])
 
     const notifications = data?.data || []
 
@@ -72,6 +83,9 @@ const Notifications = () => {
             zIndex={50}
             bottomLink="/notifications"
             notificationCount={notificationCount}
+            open={open}
+            setOpen={setOpen}
+            onClick={handleClick}
         >
             {
                 notifications.map((notification: Not) => {
