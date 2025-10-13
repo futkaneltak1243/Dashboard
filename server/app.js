@@ -89,6 +89,72 @@ app.get("/api/dashboard", (req, res) => {
     });
 });
 
+
+// Get the only Super Admin
+app.get("/api/super-admin", (req, res) => {
+    const sql = "SELECT * FROM users WHERE role = 'Super Admin' LIMIT 1";
+
+    db.get(sql, (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Super Admin not found." });
+        res.status(200).json({ data: row });
+    });
+});
+
+// Update the Super Admin
+app.put("/api/super-admin", async (req, res) => {
+    const { fullname, username, email, status, avatar = null, password } = req.body;
+
+    if (!fullname || !username || !email || !status) {
+        return res
+            .status(400)
+            .json({ error: "fullname, username, email, and status are required." });
+    }
+
+    try {
+        // Check if Super Admin exists
+        db.get("SELECT id FROM users WHERE role = 'Super Admin' LIMIT 1", async (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (!user) return res.status(404).json({ error: "Super Admin not found." });
+
+            const fields = ["fullname", "username", "email", "status", "avatar"];
+            const params = [fullname, username, email, status, avatar];
+
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                fields.push("password");
+                params.push(hashedPassword);
+            }
+
+            const setClause = fields.map(field => `${field} = ?`).join(", ");
+            const sql = `UPDATE users SET ${setClause} WHERE role = 'Super Admin'`;
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    if (err.message.includes("UNIQUE constraint failed")) {
+                        return res.status(409).json({ error: "Username or email already exists." });
+                    }
+                    return res.status(500).json({ error: err.message });
+                }
+
+                res.status(200).json({
+                    message: "Super Admin updated successfully",
+                    data: {
+                        fullname,
+                        username,
+                        email,
+                        status,
+                        avatar,
+                    },
+                });
+            });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update Super Admin." });
+    }
+});
+
+
 /** 🔹 USERS API */
 app.get("/api/users", (req, res) => {
     const { status, role, name, page = 1, limit = 10 } = req.query;
