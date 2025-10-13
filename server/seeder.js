@@ -222,8 +222,121 @@ db.serialize(() => {
     });
 });
 
-db.close((err) => {
-    if (err) console.error(chalk.red("Error closing database:"), err.message);
-    else console.log(chalk.blue("Seeding completed successfully."));
-});
+// NOTIFICATIONS
+const insertNotification = db.prepare(`
+        INSERT INTO notifications (type, message) VALUES (?, ?)
+    `);
+
+// We'll need to read users and orders to build notifications
+const getUsers = () => {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT id, fullname, username, role FROM users WHERE role != 'Super Admin'`, (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+        });
+    });
+};
+
+const getOrders = () => {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT id, user_id FROM orders`, (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+        });
+    });
+};
+
+async function seedNotifications() {
+    try {
+        const users = await getUsers();
+        const orders = await getOrders();
+
+        // Collect all notifications in an array first
+        const notifications = [];
+
+        // User-created
+        users.slice(0, 10).forEach((user) => {
+            notifications.push({
+                type: "user_created",
+                message: `${user.fullname} created his account`,
+            });
+        });
+
+        // User-edited
+        users.slice(10, 20).forEach((user) => {
+            notifications.push({
+                type: "user_edited",
+                message: `${user.fullname} edited his account`,
+            });
+        });
+
+        // User-deleted
+        users.slice(20, 25).forEach((user) => {
+            notifications.push({
+                type: "user_deleted",
+                message: `${user.fullname} deleted his account`,
+            });
+        });
+
+        // Order-created
+        for (const order of orders.slice(0, 20)) {
+            const user = users.find((u) => u.id === order.user_id);
+            if (user) {
+                notifications.push({
+                    type: "order_created",
+                    message: `${user.fullname} made the order ${order.id}`,
+                });
+            }
+        }
+
+        function strongShuffle(array) {
+            // Run Fisher–Yates shuffle multiple times
+            for (let round = 0; round < 3; round++) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // Second pass: avoid consecutive same types
+            for (let i = 1; i < array.length; i++) {
+                if (array[i].type === array[i - 1].type) {
+                    const swapIndex = array.findIndex(
+                        (n, idx) => idx > i && n.type !== array[i].type
+                    );
+                    if (swapIndex !== -1) {
+                        [array[i], array[swapIndex]] = [array[swapIndex], array[i]];
+                    }
+                }
+            }
+            return array;
+        }
+
+        strongShuffle(notifications)
+
+        // Now insert in randomized order
+        notifications.forEach(({ type, message }) => {
+            insertNotification.run([type, message], (err) => {
+                if (err) console.error(chalk.red("Failed to insert notification:"), err.message);
+            });
+        });
+
+        console.log(chalk.green("Notifications seeded."));
+
+        insertNotification.finalize(() => {
+            db.close((err) => {
+                if (err) console.error(chalk.red("Error closing database:"), err.message);
+                else console.log(chalk.blue("Seeding completed successfully."));
+            });
+        });
+    } catch (err) {
+        console.error(chalk.red("Error seeding notifications:"), err.message);
+    }
+}
+
+seedNotifications();
+
+
+
+
 

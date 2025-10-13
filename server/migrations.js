@@ -98,6 +98,14 @@ db.serialize(() => {
     );
   `);
 
+  db.run(`
+    CREATE TABLE notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT NOT NULL,
+      message TEXT NOT NULL
+    );
+  `);
+
   console.info(chalk.green("All tables created successfully!"));
 });
 

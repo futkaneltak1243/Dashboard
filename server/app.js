@@ -4,11 +4,22 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
+const { Server } = require("socket.io");
+const { faker } = require("@faker-js/faker");
+const http = require("http");
+const chalk = require("chalk");
+
+
 
 
 const app = express();
 const db = new sqlite3.Database("database.db");
-
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+    },
+});
 app.use(cors());
 app.use(express.json());
 
@@ -768,6 +779,35 @@ app.get("/api/orders", (req, res) => {
     });
 });
 
+app.get("/api/notifications", (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const baseSql = `FROM notifications`;
+    const sql = `SELECT * ${baseSql} ORDER BY id DESC LIMIT ? OFFSET ?`;
+    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
+
+    db.get(countSql, [], (err, countResult) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        db.all(sql, [parseInt(limit), offset], (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            const total = countResult.total;
+            res.status(200).json({
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / limit),
+                count: rows.length,
+                data: rows,
+            });
+        });
+    });
+});
+
+
 app.get("/api/search", (req, res) => {
     const { key } = req.query;
     if (!key) {
@@ -849,8 +889,153 @@ app.get("/api/search", (req, res) => {
 });
 
 
+/**
+ * handle server actions + sending notifications
+ */
 
-app.listen(3000, () => {
+function getRandomUser(excludeRole = null) {
+    return new Promise((resolve, reject) => {
+        const sql = excludeRole
+            ? `SELECT * FROM users WHERE role != ? ORDER BY RANDOM() LIMIT 1`
+            : `SELECT * FROM users ORDER BY RANDOM() LIMIT 1`;
+        const params = excludeRole ? [excludeRole] : [];
+        db.get(sql, params, (err, row) => (err ? reject(err) : resolve(row)));
+    });
+}
+
+function getRandomProduct() {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT * FROM products ORDER BY RANDOM() LIMIT 1`, [], (err, row) =>
+            err ? reject(err) : resolve(row)
+        );
+    });
+}
+
+function createNotification(type, message) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `INSERT INTO notifications (type, message) VALUES (?, ?)`,
+            [type, message],
+            function (err) {
+                if (err) reject(err);
+                else resolve(this.lastID);
+            }
+        );
+    });
+}
+
+async function handleUserCreated() {
+    const fullname = faker.person.fullName();
+    const username = faker.internet.username();
+    const email = faker.internet.email();
+    const password = bcrypt.hashSync(faker.internet.password(), 10);
+    const role = faker.helpers.arrayElement(['Admin', 'Manager', 'Seller', 'Delivery Agent', 'Customer']);
+    const status = faker.helpers.arrayElement(["active", "inactive", "pending"]);
+
+    db.run(
+        `INSERT INTO users (fullname, username, email, password, role, status, avatar)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [fullname, username, email, password, role, status, faker.image.avatar()],
+        async function (err) {
+            if (err) return console.error(chalk.red("User create error:"), err.message);
+
+            const message = `${fullname} created his account`;
+            await createNotification("user_created", message);
+            io.emit("notification", { type: "user_created", message });
+            console.log(chalk.green("User created + notification sent"));
+        }
+    );
+}
+
+async function handleUserEdited() {
+    const user = await getRandomUser("Super Admin");
+    if (!user) return;
+
+    const message = `${user.fullname} edited his account`;
+    await createNotification("user_edited", message);
+    io.emit("notification", { type: "user_edited", message });
+    console.log(chalk.yellow("User edited + notification sent"));
+}
+
+async function handleUserDeleted() {
+    const user = await getRandomUser("Super Admin");
+    if (!user) return;
+
+    db.run(`DELETE FROM users WHERE id = ?`, [user.id], async (err) => {
+        if (err) return console.error(chalk.red("User delete error:"), err.message);
+
+        const message = `${user.fullname} deleted his account`;
+        await createNotification("user_deleted", message);
+        io.emit("notification", { type: "user_deleted", message });
+        console.log(chalk.red("User deleted + notification sent"));
+    });
+}
+
+async function handleOrderCreated() {
+    const user = await getRandomUser("Super Admin");
+    if (!user) return;
+
+    const address = faker.location.streetAddress();
+    const date = new Date().toISOString().split("T")[0];
+    const status = faker.helpers.arrayElement([
+        'Processing',
+        'Rejected',
+        'On Hold'
+    ]);
+
+    db.run(
+        `INSERT INTO orders (user_id, address, date, status) VALUES (?, ?, ?, ?)`,
+        [user.id, address, date, status],
+        async function (err) {
+            if (err) return console.error(chalk.red("Order create error:"), err.message);
+
+            const orderId = this.lastID;
+
+            // Link random product
+            const product = await getRandomProduct();
+            db.run(
+                `INSERT INTO orders_products (order_id, product_id) VALUES (?, ?)`,
+                [orderId, product.id]
+            );
+
+            const message = `${user.fullname} made the order ${orderId}`;
+            await createNotification("order_created", message);
+            io.emit("notification", { type: "order_created", message });
+            console.log(chalk.green("Order created + notification sent"));
+        }
+    );
+}
+
+function chooseAction() {
+    const roll = Math.random() * 14;
+    if (roll < 4) return "order_created";
+    if (roll < 8) return "user_created";
+    if (roll < 12) return "user_edited";
+    return "user_deleted";
+}
+
+setInterval(async () => {
+    const action = chooseAction();
+    console.log(chalk.cyan(`\nPerforming action: ${action}`));
+
+    switch (action) {
+        case "order_created":
+            await handleOrderCreated();
+            break;
+        case "user_created":
+            await handleUserCreated();
+            break;
+        case "user_edited":
+            await handleUserEdited();
+            break;
+        case "user_deleted":
+            await handleUserDeleted();
+            break;
+    }
+}, 20_000);
+
+
+server.listen(3000, () => {
     console.log("Server started on PORT :3000");
     console.log("Index:\nhttp://localhost:3000/");
 });
