@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type FC, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type FC, type SetStateAction } from "react";
 import { FormDialog } from "../../components/FormDialog"
 import { handleSubmit } from "../../utils/handleSubmit";
 import toast from "react-hot-toast";
@@ -51,6 +51,10 @@ const EditForm: FC<EditFormProps> = (
             setLoading: setIsEditFormSubmitting,
         });
     };
+
+    useEffect(() => {
+        if (!editFormOpen) resetFormData()
+    }, [editFormOpen])
 
 
     return (
