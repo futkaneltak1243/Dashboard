@@ -27,7 +27,7 @@ const AccountMenu: FC<AccountMenuProps> & {
                     <div className="mr-0 md:mr-[16px]">
                         <img
                             src={avatar}
-                            className="w-[44px] h-[44px] rounded-full"
+                            className="w-[44px] h-[44px] rounded-full object-cover"
                         ></img>
                     </div>
                     <div className=" hidden md:flex">
@@ -43,7 +43,7 @@ const AccountMenu: FC<AccountMenuProps> & {
                     </div>
                 </div>
             </TriggerWithPopover.Trigger>
-            <TriggerWithPopover.Popover>
+            <TriggerWithPopover.Popover z={50}>
                 <div className="w-[205px] divide-y-[1px] divide-lightgray dark:divide-darkgray bg-items-light dark:bg-items-dark rounded-xl shadow-lg">
                     {children}
                 </div>

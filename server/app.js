@@ -103,12 +103,13 @@ app.get("/api/super-admin", (req, res) => {
 
 // Update the Super Admin
 app.put("/api/super-admin", async (req, res) => {
-    const { fullname, username, email, status, avatar = null, password } = req.body;
+    const { fullname, username, email, status, avatar, password } = req.body;
 
-    if (!fullname || !username || !email || !status) {
-        return res
-            .status(400)
-            .json({ error: "fullname, username, email, and status are required." });
+    // Validate required fields
+    if (!fullname || !username || !email || !status || !avatar) {
+        return res.status(400).json({
+            error: "fullname, username, email, status, and avatar are required.",
+        });
     }
 
     try {
@@ -120,6 +121,7 @@ app.put("/api/super-admin", async (req, res) => {
             const fields = ["fullname", "username", "email", "status", "avatar"];
             const params = [fullname, username, email, status, avatar];
 
+            // Handle optional password update
             if (password) {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 fields.push("password");
@@ -132,7 +134,9 @@ app.put("/api/super-admin", async (req, res) => {
             db.run(sql, params, function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
-                        return res.status(409).json({ error: "Username or email already exists." });
+                        return res
+                            .status(409)
+                            .json({ error: "Username or email already exists." });
                     }
                     return res.status(500).json({ error: err.message });
                 }
@@ -153,6 +157,7 @@ app.put("/api/super-admin", async (req, res) => {
         res.status(500).json({ error: "Failed to update Super Admin." });
     }
 });
+
 
 
 /** 🔹 USERS API */

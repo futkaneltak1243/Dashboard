@@ -38,7 +38,7 @@ db.serialize(() => {
         );
     };
 
-    runUser("Furkan Eltakriti", "furkaneltakriti", "ft.142001@gmail.com", "Super Admin", "active", null);
+    runUser("Furkan Eltakriti", "furkaneltakriti", "ft.142001@gmail.com", "Super Admin", "active", "http://localhost:3000/uploads/profile.jpeg");
     runUser("Lulu Farhat", "lulufarhat", faker.internet.email({ firstName: "Lulu", lastName: "Farhat" }), "Admin", "active", null);
 
     for (let i = 0; i < 98; i++) {

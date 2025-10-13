@@ -1,10 +1,10 @@
 import type { FC } from "react"
-import { Menu, Settings } from "lucide-react"
-import { AccountMenu } from "../../AccountMenu"
+import { Menu } from "lucide-react"
 import { useSidebar } from "../../../contexts/sidebar-context/SidebarContextProvider"
 
 import Search from "./Search"
 import Notifications from "./Notifications"
+import Account from "./Account"
 
 
 
@@ -23,12 +23,7 @@ const Header: FC = () => {
             <div className="flex items-center w-1/3 sm:w-1/2 justify-end">
                 <Notifications />
 
-                <AccountMenu avatar='https://avatar.iran.liara.run/public' name="Lulu" role='Admin' className="md:mr-[31px] mr-3">
-                    <AccountMenu.Item label="Manage Account" Icon={Settings} onClick={() => null} />
-                    <AccountMenu.Item label="Manage Account" Icon={Settings} onClick={() => null} />
-                    <AccountMenu.Item label="Manage Account" Icon={Settings} onClick={() => null} />
-                    <AccountMenu.Item label="Manage Account" Icon={Settings} onClick={() => null} />
-                </AccountMenu>
+                <Account />
             </div>
 
         </header>
