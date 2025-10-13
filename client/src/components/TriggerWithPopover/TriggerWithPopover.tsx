@@ -1,4 +1,4 @@
-import type { ReactNode, FC, ButtonHTMLAttributes, MouseEvent, ReactElement } from "react"
+import type { ReactNode, FC, ButtonHTMLAttributes, MouseEvent, ReactElement, Dispatch, SetStateAction } from "react"
 import { Children, cloneElement, createContext, isValidElement, useContext } from "react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "../classNames"
@@ -12,6 +12,8 @@ import { useCloseOnEscape } from "../../hooks/useCloseOnEscape";
 interface TriggerWithPopoverProps {
     children: ReactNode;
     className?: string;
+    open?: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>
 }
 
 
@@ -53,16 +55,28 @@ const TriggerWithPopover: FC<TriggerWithPopoverProps> & {
     Trigger: FC<TriggerProps>;
     Popover: FC<PopoverProps>;
     Close: FC<CloseProps>;
-} = ({ children, className }) => {
-
+} = ({ children, className, open, setOpen }) => {
     const [popoverOpen, setPopoverOpen] = useState(false)
     const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-    const contextValue: ITriggerWithPopoverContext = {
-        popoverOpen,
-        setPopoverOpen,
-        triggerRef,
+    let contextValue: ITriggerWithPopoverContext;
+    if (open !== undefined && setOpen) {
+        contextValue = {
+            popoverOpen: open,
+            setPopoverOpen: setOpen,
+            triggerRef,
+        }
+    } else {
+        contextValue = {
+            popoverOpen,
+            setPopoverOpen,
+            triggerRef,
+        }
+
+
     }
+
+
 
     return <TriggerWithPopoverContext.Provider value={contextValue}><div className={className}>{children}</div></TriggerWithPopoverContext.Provider>;
 };
