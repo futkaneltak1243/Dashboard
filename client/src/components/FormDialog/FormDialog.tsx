@@ -95,7 +95,7 @@ const Body: FC<BodyProps> = ({ children, className, title, buttonLabel, onSubmit
             </div>
             <div className="flex items-center justify-end mt-8">
                 <Dialog.Close>
-                    <button className=" h-9 w-21 mr-3 border border-lightgray rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150">
+                    <button className=" h-9 w-21 mr-3 border border-lightgray rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150 text-text-light dark:text-text-dark">
                         Cancel
                     </button>
                 </Dialog.Close>
@@ -130,7 +130,7 @@ const TextInput: FC<TextInputProps> = ({ label, value, full = false, onChange, .
             "col-span-2": full
         })}>
             <p
-                className="mb-2"
+                className="mb-2 text-text-light dark:text-text-dark"
             >
                 {label}
             </p>
@@ -150,13 +150,13 @@ const SelectInput: FC<SelectInputProps> = ({ options, label, value, onChange, fu
     return (
         <div className={cn("w-full", { "col-span-2": full })}>
             <p
-                className="mb-2"
+                className="mb-2 text-text-light dark:text-text-dark"
             >
                 {label}
             </p>
             <div className="relative w-full">
                 <select
-                    className="appearance-none border border-gray-300 rounded-md h-10 w-full pl-3 pr-8"
+                    className="appearance-none border text-text-light dark:text-text-dark border-gray-300 rounded-md h-10 w-full pl-3 pr-8 dark:bg-items-dark2 bg-items-light"
                     value={value}
                     onChange={e => onChange?.(e)}
                     {...props}
@@ -188,11 +188,11 @@ const DateInput: FC<DateInputProps> = ({ label, value, full = false, onChange, .
         <div className={cn("flex items-start flex-col", {
             "col-span-2": full,
         })}>
-            {label && <p className="mb-2">{label}</p>}
+            {label && <p className="mb-2 text-text-light dark:text-text-dark">{label}</p>}
             <input
                 type="date"
                 className="h-10 border border-gray-300 rounded-md w-full px-3 text-gray-700 
-                           placeholder:text-gray-400 focus:outline-none focus:ring-2 
+                           dark:text-white focus:outline-none focus:ring-2 dark:bg-items-dark2 bg-items-light
                            focus:ring-primary transition-colors duration-150"
                 value={value}
                 onChange={e => onChange?.(e)}
@@ -246,7 +246,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
 
     return (
         <div className={cn("flex flex-col gap-2 col-span-2", className)}>
-            <p className="mb-2">{label}</p>
+            <p className="mb-2 text-text-light dark:text-text-dark">{label}</p>
             <label
                 htmlFor="image-upload"
                 className="w-full h-32 flex items-center justify-center border-2 border-dashed rounded-xl cursor-pointer text-gray-400 hover:text-gray-600"

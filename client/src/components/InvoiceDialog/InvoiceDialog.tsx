@@ -44,7 +44,7 @@ const Trigger: FC<TriggerProps> = ({ children }) => {
 
 const Body: FC<BodyProps> = ({ title, description, name, email, address, orderId, date, status, children, total }) => {
     return (
-        <Dialog.Body className="w-[min(90%,480px)] p-5 bg-items-light dark:bg-items-dark rounded-lg relative">
+        <Dialog.Body className="w-[min(90%,480px)] p-5 bg-items-light dark:bg-items-dark rounded-lg relative text-black dark:text-white">
             <Dialog.Close>
                 <X
                     className="absolute top-4 right-4 text-midgray cursor-pointer"
@@ -108,7 +108,7 @@ const Body: FC<BodyProps> = ({ title, description, name, email, address, orderId
 
 const Item: FC<ItemProps> = ({ name, price }) => {
     return (
-        <div className="w-full border border-lightgray p-4 flex items-center justify-between rounded-lg mt-3">
+        <div className="w-full border border-lightgray p-4 flex items-center justify-between rounded-lg mt-3 text-black dark:text-white">
             <p className="text-sm"> {name}</p>
             <p>{price}</p>
 

@@ -58,12 +58,12 @@ const Body: FC<BodyProps> = ({ className, title, Icon, iconClass, description, l
 
             </div>
 
-            <div>
+            <div className="text-black dark:text-white">
                 {description}
             </div>
             <div className="flex items-center justify-end mt-8">
                 <Dialog.Close>
-                    <button className=" h-9 w-21 mr-3 border border-lightgray rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150">
+                    <button className=" h-9 w-21 mr-3 border border-lightgray rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150 text-black dark:text-white">
                         Cancel
                     </button>
                 </Dialog.Close>
