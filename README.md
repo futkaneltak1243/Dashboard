@@ -17,7 +17,8 @@ npm run migrate
 npm run seed
 npm start
 ```
-3. Set up the client \n
+3. Set up the client
+
 Open a new terminal tab and run:
 
 ```bash
@@ -25,7 +26,8 @@ cd client
 npm install
 ```
 
-4. Create the environment file\n
+4. Create the environment file
+   
 In the client folder, create a file named .env and add the following line:
 ```
 VITE_SERVER_DOMAIN=http://localhost:3000/api
