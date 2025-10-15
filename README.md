@@ -27,7 +27,9 @@ npm install
 
 4. Create the environment file
 In the client folder, create a file named .env and add the following line:
+```
 VITE_SERVER_DOMAIN=http://localhost:3000/api
+```
 
 3. Start the client
 ```bash
